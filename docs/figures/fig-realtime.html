@@ -1,0 +1,163 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  :root{
+    --ink:#1b1c1e; --sub:#6b7076; --line:#e3e1dd;
+    --red:#d92d34; --redbg:#fdf1f1; --redline:#f3cfd0;
+    --orange:#e0900b; --blue:#3b5bdb;
+    --gray:#9aa0a6;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    width:1200px;height:944px;background:#fbfaf9;color:var(--ink);position:relative;
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    -webkit-font-smoothing:antialiased;padding:34px 52px 0;
+  }
+  h1{font-size:33px;font-weight:700;text-align:center}
+  .sub{font-size:17px;color:var(--sub);text-align:center;margin-top:11px}
+
+  /* ---------- top: loop ---------- */
+  .top{display:grid;grid-template-columns:560px 1fr;gap:26px;margin-top:26px;align-items:start}
+
+  .editor{background:#252830;border-radius:11px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08)}
+  .bar{display:flex;align-items:center;gap:8px;padding:11px 15px;background:#2e323c}
+  .dot{width:11px;height:11px;border-radius:50%}
+  .fn{font-family:"SF Mono",Menlo,monospace;font-size:13px;color:#c8ccd4;margin-left:9px}
+  .code{padding:13px 0 15px;font-family:"SF Mono",Menlo,monospace;font-size:13.5px;line-height:2.0}
+  .ln{display:flex}
+  .ln .no{width:52px;text-align:right;padding-right:16px;color:#666d7c;flex:none}
+  .ln .tx{color:#d7dbe2;white-space:pre}
+  .ln.hit{background:#3a2528}
+  .kw{color:#c792ea}.st{color:#e2b56b}.fnc{color:#82aaff}.cm{color:#68707f}
+  .sq{border-bottom:2.5px wavy var(--red);text-decoration:underline wavy #ef4d54;text-decoration-thickness:2px;text-underline-offset:5px}
+  .tip{margin:9px 52px 0 68px;background:#33373f;border-left:3px solid var(--red);border-radius:6px;padding:10px 13px;color:#dfe3e9;font-size:12.5px;line-height:1.65;font-family:"Hiragino Sans",sans-serif}
+  .tip b{color:#fff}
+  .tip .rid{font-family:"SF Mono",Menlo,monospace;color:#98a0ad;font-size:11.5px}
+
+  .loop{background:#fff;border:1px solid var(--redline);border-radius:11px;padding:17px 19px 15px}
+  .loop h2{font-size:16.5px;font-weight:700;margin-bottom:3px}
+  .loop .cap{font-size:13px;color:var(--sub);margin-bottom:13px}
+  .step{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;background:#fdf5f5;font-size:14.5px;font-weight:600}
+  .step .i{flex:none;width:24px;height:24px;border-radius:50%;background:var(--red);color:#fff;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .step small{font-weight:500;color:#8a7b7c;font-size:12.5px;margin-left:auto}
+  .arw{text-align:center;color:#e0aeb0;font-size:15px;line-height:1;margin:4px 0}
+  .cyc{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;padding-top:11px;border-top:1px dashed #ecd7d8;font-size:13.5px;color:#8a7b7c}
+  .cyc b{background:var(--red);color:#fff;border-radius:999px;padding:3px 11px;font-size:13px}
+
+  /* ---------- bottom: cost curve ---------- */
+  .costwrap{margin-top:30px}
+  .costhd{display:flex;align-items:baseline;gap:12px;margin-bottom:10px}
+  .costhd h2{font-size:18px;font-weight:700}
+  .costhd span{font-size:13.5px;color:var(--sub)}
+
+  .chart{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;align-items:end;height:186px}
+  .col{display:flex;flex-direction:column;justify-content:flex-end;height:100%}
+  .bl{font-size:12px;color:#8b9096;text-align:center;margin-bottom:6px;line-height:1.45}
+  .bl b{display:block;color:#5b6066;font-size:12.5px}
+  .bar2{border-radius:9px 9px 0 0;border:1px solid;border-bottom:none;padding:10px 12px 11px;display:flex;flex-direction:column;justify-content:flex-end;gap:5px}
+  .bar2 .st1{font-size:15px;font-weight:700;line-height:1.35}
+  .bar2 .st2{font-size:12px;line-height:1.6}
+  .b1{height:60px;background:#fdeff0;border-color:var(--redline)}
+  .b1 .st1{color:var(--red)}
+  .b2{height:98px;background:#f6f5f2;border-color:#dedcd8}
+  .b3{height:142px;background:#f1efeb;border-color:#d6d3ce}
+  .b4{height:186px;background:#eae7e2;border-color:#cdc9c3}
+  .b2 .st1,.b3 .st1,.b4 .st1{color:#5b6066}
+  .b2 .st2,.b3 .st2,.b4 .st2{color:#8b9096}
+  .axis{height:2px;background:#d9d7d2;margin-top:0}
+  .axlbl{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:9px}
+  .axlbl div{text-align:center;font-size:13.5px;font-weight:700;color:#5b6066}
+  .axlbl div.on{color:var(--red)}
+  .axlbl small{display:block;font-weight:500;font-size:11.5px;color:#a2a6ab;margin-top:2px}
+
+  .here{display:inline-flex;align-items:center;gap:5px;background:var(--red);color:#fff;font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px;margin:0 auto 6px}
+
+  .foot{position:absolute;left:52px;right:52px;bottom:22px;text-align:center;border-top:1px solid var(--line);padding-top:15px}
+  .foot .m{font-size:17.5px;font-weight:700}
+  .foot .m em{font-style:normal;color:var(--red)}
+  .foot .s{font-size:13.5px;color:var(--sub);margin-top:6px}
+</style>
+<body>
+  <h1>特徴 1：リアルタイム SAST 解析</h1>
+  <div class="sub">解析エンジンが手元にあるので、コードをどこかへ送って結果を待つ工程が存在しない</div>
+
+  <div class="top">
+    <div class="editor">
+      <div class="bar">
+        <span class="dot" style="background:#ff5f57"></span>
+        <span class="dot" style="background:#febc2e"></span>
+        <span class="dot" style="background:#28c840"></span>
+        <span class="fn">user_manager.py</span>
+      </div>
+      <div class="code">
+        <div class="ln"><span class="no">76</span><span class="tx"><span class="kw">def</span> <span class="fnc">import_users</span>(path):</span></div>
+        <div class="ln"><span class="no">77</span><span class="tx">    <span class="cm"># アップロードされた ZIP を展開</span></span></div>
+        <div class="ln hit"><span class="no">78</span><span class="tx">    zipfile.<span class="fnc">ZipFile</span>(path).<span class="sq">extractall</span>(UPLOAD_DIR)</span></div>
+      </div>
+      <div class="tip">
+        <b>Zip Bomb の危険があります。</b>展開後のサイズを確認せずに <code>extractall()</code> を呼ぶと、細工された ZIP でディスクを食い潰されます。<br>
+        <span class="rid">python:S5042 ／ セキュリティ</span>
+      </div>
+      <div style="height:15px"></div>
+    </div>
+
+    <div class="loop">
+      <h2>キーを打つ速度に、解析が追いつく</h2>
+      <div class="cap">この一周が、まだ自分しか見ていないコードの上で起きる</div>
+      <div class="step"><span class="i">1</span>書く<small>コードを打つ</small></div>
+      <div class="arw">▼</div>
+      <div class="step"><span class="i">2</span>指摘が出る<small>手元で即座に解析</small></div>
+      <div class="arw">▼</div>
+      <div class="step"><span class="i">3</span>修正する<small>Quick Fix も使える</small></div>
+      <div class="arw">▼</div>
+      <div class="step"><span class="i">4</span>消える<small>保存した時点で解消</small></div>
+      <div class="cyc">一周にかかる時間 <b>数秒</b></div>
+    </div>
+  </div>
+
+  <div class="costwrap">
+    <div class="costhd">
+      <h2>手戻りのコストは、見つかるのが遅いほど跳ね上がる</h2>
+      <span>同じ 1 件の問題を、どの段階で直すか</span>
+    </div>
+    <div class="chart">
+      <div class="col">
+        <div class="here">SonarQube for IDE が指摘するのは、ここ</div>
+        <div class="bar2 b1">
+          <div class="st1">その場で直る</div>
+          <div class="st2">自分の画面の中だけで完結</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="bar2 b2">
+          <div class="st1">コミットの積み直し</div>
+          <div class="st2">履歴の整理・push のやり直し</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="bar2 b3">
+          <div class="st1">2 人分の時間</div>
+          <div class="st2">指摘する側の時間<br>指摘される側の文脈の切り替え</div>
+        </div>
+      </div>
+      <div class="col">
+        <div class="bar2 b4">
+          <div class="st1">修正 → 再レビュー → 再デプロイ</div>
+          <div class="st2">調査からやり直し<br>すでに動いているものへの影響も確認</div>
+        </div>
+      </div>
+    </div>
+    <div class="axis"></div>
+    <div class="axlbl">
+      <div class="on">エディタ（書いた瞬間）<small>まだ誰も見ていない</small></div>
+      <div>コミット・テスト<small>ローカルを離れる直前</small></div>
+      <div>コードレビュー<small>他人の目に触れたあと</small></div>
+      <div>CI 通過・リリース後<small>動いているものの上で</small></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="m">指摘が出るのは、<em>直すのに一番コストがかからない瞬間</em></div>
+    <div class="s">コードは外に出ず、ネットワークに繋がっていなくても同じように指摘が出る</div>
+  </div>
+</body>

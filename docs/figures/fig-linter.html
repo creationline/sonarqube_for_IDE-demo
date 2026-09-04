@@ -1,0 +1,161 @@
+<!doctype html>
+<meta charset="utf-8">
+<style>
+  :root{
+    --ink:#1b1c1e; --sub:#6b7076; --line:#e3e1dd;
+    --red:#d92d34; --redbg:#fdf1f1; --redline:#f3cfd0;
+    --orange:#e0900b; --orangebg:#fefaf0; --orangeline:#f2dfae;
+    --blue:#3b5bdb; --bluebg:#eef1fd;
+    --green:#1f8a5c; --greenbg:#eef8f2;
+    --gray:#8b9096; --graybg:#f4f4f2; --grayline:#dedcd8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    width:1200px;height:762px;background:#fbfaf9;color:var(--ink);
+    font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    padding:34px 52px 0;position:relative;
+  }
+  h1{font-size:33px;font-weight:700;text-align:center;letter-spacing:.01em}
+  .sub{font-size:17px;color:var(--sub);text-align:center;margin-top:11px;font-weight:400}
+
+  .grid{
+    margin-top:26px;
+    display:grid;
+    grid-template-columns:64px 1fr 1fr;
+    grid-template-rows:44px auto auto;
+    column-gap:18px; row-gap:14px;
+  }
+  /* column headers */
+  .chd{display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:19px;font-weight:700;letter-spacing:.02em}
+  .chd.l{background:var(--graybg);color:#71767c;border:1px solid var(--grayline)}
+  .chd.r{background:#fdeff0;color:var(--red);border:1px solid var(--redline)}
+
+  /* row labels */
+  .rl{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
+    background:#f2f1ee;border:1px solid var(--line);border-radius:9px;
+    font-size:14px;font-weight:700;color:#5b6066;line-height:1.45;
+  }
+  .rl .n{font-size:19px;color:var(--ink)}
+  .rl .v{writing-mode:vertical-rl;letter-spacing:.16em}
+
+  .card{border-radius:11px;padding:19px 22px 20px}
+  .card.l{background:#f7f6f4;border:1px solid var(--grayline)}
+  .card.r{background:#fff;border:1px solid var(--redline);box-shadow:0 1px 0 rgba(217,45,52,.05)}
+  .lead{font-size:16.5px;font-weight:700;line-height:1.5;margin-bottom:13px}
+  .lead.m{color:#71767c}
+  .lead.a{color:var(--ink)}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-size:13.5px;padding:5px 12px;border-radius:999px;font-weight:600;white-space:nowrap}
+  .chip.g{background:#eceae6;color:#7c8087}
+  .chip.sec{background:var(--redbg);color:var(--red)}
+  .chip.bug{background:#fdf3e2;color:#b9770a}
+  .chip.mnt{background:var(--bluebg);color:var(--blue)}
+  .chip.sct{background:var(--greenbg);color:var(--green)}
+
+  .note{display:flex;align-items:flex-start;gap:9px;margin-top:15px;padding-top:14px;border-top:1px dashed #d9d7d2;font-size:14.5px;line-height:1.6}
+  .note .mk{flex:none;width:21px;height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;margin-top:1px}
+  .mk.x{background:#a9adb2}
+  .mk.o{background:var(--red)}
+  .note.bad{color:#83878d}
+  .note.good{color:#3d4146}
+  .note b{font-weight:700;color:var(--ink)}
+  code{font-family:"SF Mono",Menlo,monospace;font-size:12.5px;color:#8a8f95;background:#f2f1ee;padding:1px 6px;border-radius:4px}
+
+  /* row 2 */
+  .exts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+  .ext{
+    background:#fff;border:1px solid #dcdad6;border-radius:8px;padding:8px 12px;
+    font-size:13.5px;font-weight:600;color:#6d7278;line-height:1.35;text-align:center;min-width:104px;
+  }
+  .ext small{display:block;font-size:11px;font-weight:500;color:#a2a6ab;margin-top:2px}
+  .ext.ghost{border-style:dashed;color:#aeb2b7;background:#f7f6f4}
+
+  .one{
+    display:flex;align-items:center;gap:15px;
+    background:linear-gradient(180deg,#fff 0%,#fdf6f6 100%);
+    border:1.5px solid var(--red);border-radius:10px;padding:15px 18px;margin-bottom:13px;
+  }
+  .one .badge{flex:none;width:56px;height:56px;border-radius:14px;background:var(--red);color:#fff;
+    display:flex;align-items:baseline;justify-content:center;gap:2px;line-height:1;padding-top:16px}
+  .one .badge b{font-size:30px;font-weight:800}
+  .one .badge span{font-size:13px;font-weight:700}
+  .one .t{font-size:17px;font-weight:700}
+  .one .t small{display:block;font-size:13.5px;font-weight:600;color:#8a6f70;margin-top:4px}
+
+  .langs{display:flex;flex-wrap:wrap;gap:6px}
+  .lang{font-size:12.5px;font-weight:600;color:#5b6066;background:#f2f1ee;border-radius:5px;padding:4px 9px}
+  .lang.more{color:#9aa0a6;background:transparent}
+
+  .foot{
+    position:absolute;left:52px;right:52px;bottom:24px;text-align:center;
+    border-top:1px solid var(--line);padding-top:18px;
+  }
+  .foot .m{font-size:17.5px;font-weight:700}
+  .foot .m em{font-style:normal;color:var(--red)}
+  .foot .s{font-size:14px;color:var(--sub);margin-top:7px}
+</style>
+<body>
+  <h1>一般的なリンターとの違いは？</h1>
+  <div class="sub">見つけられる問題の種類も、そのために必要な拡張機能の数も違う</div>
+
+  <div class="grid">
+    <div></div>
+    <div class="chd l">一般的なリンター</div>
+    <div class="chd r">SonarQube for IDE</div>
+
+    <div class="rl"><span class="n">①</span><span class="v">何を見るか</span></div>
+    <div class="card l">
+      <div class="lead m">主に「書式」や「構文ルール」の統一</div>
+      <div class="chips">
+        <span class="chip g">インデント</span>
+        <span class="chip g">命名規則</span>
+        <span class="chip g">未使用の変数</span>
+        <span class="chip g">import の順序</span>
+      </div>
+      <div class="note bad"><span class="mk x">✕</span><span><b>Zip Bomb</b> のようなバグは、書式のルールでは表現できないため検知できない</span></div>
+    </div>
+    <div class="card r">
+      <div class="lead a">セキュリティ・バグ・コード品質の<b>すべて</b></div>
+      <div class="chips">
+        <span class="chip sec">セキュリティ</span>
+        <span class="chip bug">バグ</span>
+        <span class="chip mnt">保守性</span>
+        <span class="chip sct">秘密情報</span>
+      </div>
+      <div class="note good"><span class="mk o">✓</span><span><b>ZIP を上限なしで展開している（Zip Bomb）</b>も、その行で指摘される <code>python:S5042</code></span></div>
+    </div>
+
+    <div class="rl"><span class="n">②</span><span class="v">いくつ要るか</span></div>
+    <div class="card l">
+      <div class="lead m">言語ごと・用途ごとに、いくつも組み合わせる</div>
+      <div class="exts">
+        <div class="ext">ESLint<small>JavaScript</small></div>
+        <div class="ext">Ruff<small>Python</small></div>
+        <div class="ext">Bandit<small>セキュリティ</small></div>
+        <div class="ext">Checkstyle<small>Java</small></div>
+        <div class="ext ghost">＋ 言語が増えるたびに<small>そのぶん増えていく</small></div>
+      </div>
+      <div class="note bad"><span class="mk x">✕</span><span>導入・設定・バージョン管理を、<b>ツールの数だけ</b>やることになる</span></div>
+    </div>
+    <div class="card r">
+      <div class="lead a">この拡張機能 <b>1 つ</b>で完結する</div>
+      <div class="one">
+        <div class="badge"><b>1</b><span>つ</span></div>
+        <div class="t">SonarQube for IDE<small>バグ・セキュリティ・保守性・秘密情報の検知まで</small></div>
+      </div>
+      <div class="langs">
+        <span class="lang">Python</span><span class="lang">JavaScript</span><span class="lang">TypeScript</span>
+        <span class="lang">Java</span><span class="lang">C#</span><span class="lang">Go</span>
+        <span class="lang">PHP</span><span class="lang">HTML / CSS</span><span class="lang more">ほか多数の言語に対応</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="m">ツールの導入・管理の手間が減り、<em>環境をシンプルに保てる</em></div>
+    <div class="s">「書式が揃っているか」ではなく、「危ないか・壊れていないか・読めるか」まで、同じ 1 つの拡張機能が見る</div>
+  </div>
+</body>
