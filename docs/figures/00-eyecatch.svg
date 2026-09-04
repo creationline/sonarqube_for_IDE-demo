@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',sans-serif">
+  <defs>
+    <style>.m{font-family:'SFMono-Regular',Menlo,Consolas,monospace}</style>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#4e9bcd" stop-opacity="0.30"/>
+      <stop offset="100%" stop-color="#4e9bcd" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0e1626"/>
+      <stop offset="100%" stop-color="#0a111e"/>
+    </linearGradient>
+    <filter id="cardsh" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <filter id="popsh" x="-25%" y="-40%" width="150%" height="200%">
+      <feDropShadow dx="0" dy="8" stdDeviation="14" flood-color="#000000" flood-opacity="0.50"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <ellipse cx="1010" cy="140" rx="560" ry="380" fill="url(#glow)"/>
+  <rect x="0" y="0" width="1200" height="6" fill="#4e9bcd"/>
+
+  <!-- ================= LEFT : message ================= -->
+  <rect x="80" y="112" width="286" height="34" rx="17" fill="#16233a" stroke="#2b3d5c"/>
+  <circle cx="103" cy="129" r="4.5" fill="#4ec9a5"/>
+  <text x="118" y="135" font-size="15" font-weight="600" fill="#9fb6d2">VS Code 拡張機能 ／ 旧 SonarLint</text>
+
+  <text x="80" y="240" font-size="50" font-weight="700" fill="#ffffff" letter-spacing="-0.5">書いた瞬間に、</text>
+  <text x="80" y="306" font-size="50" font-weight="700" fill="#ffffff" letter-spacing="-0.5">その場で見つかる。</text>
+
+  <rect x="80" y="338" width="66" height="5" rx="2.5" fill="#4e9bcd"/>
+
+  <text x="80" y="404" font-size="34" font-weight="700" fill="#62b0e0">SonarQube for IDE</text>
+  <text x="80" y="436" font-size="16" fill="#8ca0bb">手元の PC の中で解析。コードはネットワークに出ません</text>
+
+  <g font-size="15" font-weight="600">
+    <rect x="80"  y="480" width="126" height="36" rx="18" fill="#13203a" stroke="#2b3d5c"/>
+    <text x="143" y="503" text-anchor="middle" fill="#c3d4e8">待ち時間ゼロ</text>
+    <rect x="218" y="480" width="171" height="36" rx="18" fill="#13203a" stroke="#2b3d5c"/>
+    <text x="303" y="503" text-anchor="middle" fill="#c3d4e8">コードが外に出ない</text>
+    <rect x="401" y="480" width="156" height="36" rx="18" fill="#13203a" stroke="#2b3d5c"/>
+    <text x="479" y="503" text-anchor="middle" fill="#c3d4e8">全員が同じルール</text>
+  </g>
+
+  <!-- ================= RIGHT : editor card ================= -->
+  <g transform="translate(0,44)">
+    <g filter="url(#cardsh)">
+      <rect x="636" y="104" width="484" height="312" rx="14" fill="#111b2e" stroke="#2a3550"/>
+    </g>
+    <path d="M636 118 a14 14 0 0 1 14 -14 h456 a14 14 0 0 1 14 14 v28 h-484 z" fill="#18243c"/>
+    <line x1="636" y1="146" x2="1120" y2="146" stroke="#2a3550"/>
+    <circle cx="660" cy="125" r="5" fill="#f2545b"/>
+    <circle cx="678" cy="125" r="5" fill="#e0a336"/>
+    <circle cx="696" cy="125" r="5" fill="#4ec9a5"/>
+    <text x="716" y="130" font-size="13.5" fill="#8ca0bb" class="m">user_manager.py</text>
+    <rect x="1062" y="115" width="42" height="20" rx="10" fill="#f2545b"/>
+    <text x="1083" y="129" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff" class="m">3</text>
+
+    <g class="m" font-size="15">
+      <text x="684" y="190" text-anchor="end" fill="#4a5a75">12</text>
+      <text x="684" y="221" text-anchor="end" fill="#4a5a75">13</text>
+      <text x="684" y="252" text-anchor="end" fill="#4a5a75">14</text>
+      <text x="704.0" y="190" fill="#c792ea">class <tspan fill="#82d8d8">UserManager</tspan><tspan fill="#d6deeb">:</tspan></text>
+      <text x="739.7" y="221" fill="#d6deeb"><tspan fill="#c792ea">def</tspan> <tspan fill="#82aaff">__init__</tspan>(self):</text>
+      <text x="775.4" y="252" fill="#d6deeb">self.api_key = <tspan fill="#ecc48d">"sk_live_51H8xQ"</tspan></text>
+    </g>
+    <path d="M 909.2 258.0 q 1.50 -3.0 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0 t 3.00 0" fill="none" stroke="#f2545b" stroke-width="2.2" stroke-linecap="round"/>
+
+    <g filter="url(#popsh)">
+      <rect x="604" y="288" width="500" height="98" rx="12" fill="#ffffff"/>
+    </g>
+    <rect x="604" y="288" width="6" height="98" rx="3" fill="#f2545b"/>
+    <circle cx="642" cy="337" r="13" fill="#f2545b"/>
+    <text x="642" y="342" text-anchor="middle" font-size="16" font-weight="700" fill="#ffffff">!</text>
+    <text x="668" y="326" font-size="18" font-weight="700" fill="#111827">API キーがソースコードに直書きされている</text>
+    <text x="668" y="352" font-size="13" fill="#6b7280" class="m">python:S6418 ／ user_manager.py:14</text>
+    <rect x="668" y="360" width="92" height="20" rx="10" fill="#fee2e2"/>
+    <text x="714" y="374" text-anchor="middle" font-size="12" font-weight="700" fill="#991b1b">セキュリティ</text>
+  </g>
+</svg>

@@ -1,0 +1,107 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',sans-serif">
+  <defs><style>.m{font-family:'SFMono-Regular',Menlo,Consolas,monospace}</style></defs>
+  <rect width="1200" height="900" fill="#ffffff"/>
+  <text x="600" y="52" text-anchor="middle" font-size="27" font-weight="700" fill="#111827">仕込んだ 5 つの問題は、コードのここにある</text>
+  <text x="600" y="86" text-anchor="middle" font-size="16.5" fill="#6b7280">左が実際のコード、右がそこに出る指摘。セキュリティもバグも保守性も、同じ 1 つの拡張機能が拾う</text>
+
+  <!-- ============ user_manager.py ============ -->
+  <rect x="60" y="130" width="520" height="432" rx="12" fill="#1e2430"/>
+  <path d="M60 142 a12 12 0 0 1 12 -12 h496 a12 12 0 0 1 12 12 v30 h-520 z" fill="#2a313f"/>
+  <circle cx="82" cy="157" r="5" fill="#ff5f57"/><circle cx="98" cy="157" r="5" fill="#febc2e"/><circle cx="114" cy="157" r="5" fill="#28c840"/>
+  <text x="134" y="162" font-size="13" fill="#c9d1da" class="m">user_manager.py</text>
+  <rect x="60" y="230" width="520" height="26" fill="#4a2226"/>
+  <rect x="60" y="282" width="520" height="26" fill="#4a2226"/>
+  <rect x="60" y="334" width="520" height="26" fill="#4a3a18"/>
+  <rect x="60" y="438" width="520" height="104" fill="#4a3a18"/>
+  <g class="m" font-size="12.5">
+    <g fill="#5d6675" text-anchor="end">
+      <text x="106" y="196">26</text>
+      <text x="106" y="248">40</text>
+      <text x="106" y="300">51</text>
+      <text x="106" y="352">78</text>
+      <text x="106" y="404">106</text>
+      <text x="106" y="456">110</text><text x="106" y="482">111</text><text x="106" y="508">112</text><text x="106" y="534">113</text>
+    </g>
+    <g fill="#4b5361" text-anchor="middle">
+      <text x="100" y="222">⋮</text><text x="100" y="274">⋮</text><text x="100" y="326">⋮</text><text x="100" y="378">⋮</text><text x="100" y="430">⋮</text>
+    </g>
+    <text x="122" y="196"><tspan fill="#c678dd">import</tspan><tspan fill="#c9d1da"> zipfile</tspan></text>
+    <text x="122" y="248"><tspan fill="#e5c07b">API_KEY</tspan><tspan fill="#c9d1da"> = </tspan><tspan fill="#98c379">"aB3xY9zQ7mK2pL5nR8t…"</tspan></text>
+    <text x="122" y="300"><tspan fill="#e5c07b">DB_PASSWORD</tspan><tspan fill="#c9d1da"> = </tspan><tspan fill="#98c379">"kR7vQn2mXt9Bz4Lw"</tspan></text>
+    <text x="122" y="352"><tspan fill="#c9d1da">zipfile.ZipFile(path).</tspan><tspan fill="#61afef">extractall</tspan><tspan fill="#c9d1da">(UPLOAD_DIR)</tspan></text>
+    <text x="122" y="404"><tspan fill="#c678dd">try</tspan><tspan fill="#c9d1da">:</tspan></text>
+    <text x="146" y="456"><tspan fill="#c678dd">if</tspan><tspan fill="#c9d1da"> role == </tspan><tspan fill="#98c379">"admin"</tspan><tspan fill="#c9d1da">:</tspan></text>
+    <text x="170" y="482"><tspan fill="#c678dd">if</tspan><tspan fill="#c9d1da"> age &gt;= </tspan><tspan fill="#d19a66">18</tspan><tspan fill="#c9d1da">:</tspan></text>
+    <text x="194" y="508"><tspan fill="#c678dd">if</tspan><tspan fill="#c9d1da"> country == </tspan><tspan fill="#98c379">"JP"</tspan><tspan fill="#c9d1da">:</tspan></text>
+    <text x="218" y="534"><tspan fill="#c678dd">if</tspan><tspan fill="#c9d1da"> score &gt;= </tspan><tspan fill="#d19a66">80</tspan><tspan fill="#c9d1da">:</tspan></text>
+  </g>
+  <path d="M540 396 h10 v146 h-10" fill="none" stroke="#e0a33a" stroke-width="2"/>
+  <text x="534" y="473" text-anchor="end" font-size="11" fill="#e0a33a">ネスト 5 段</text>
+  <circle cx="556" cy="243" r="11" fill="#e06c75"/><text x="556" y="248" text-anchor="middle" font-size="12" font-weight="700" fill="#1e2430">1</text>
+  <circle cx="556" cy="295" r="11" fill="#e06c75"/><text x="556" y="300" text-anchor="middle" font-size="12" font-weight="700" fill="#1e2430">2</text>
+  <circle cx="556" cy="347" r="11" fill="#e0a33a"/><text x="556" y="352" text-anchor="middle" font-size="12" font-weight="700" fill="#1e2430">4</text>
+  <circle cx="512" cy="529" r="11" fill="#e0a33a"/><text x="512" y="534" text-anchor="middle" font-size="12" font-weight="700" fill="#1e2430">5</text>
+
+  <!-- ============ test_user_manager.py ============ -->
+  <rect x="60" y="594" width="520" height="190" rx="12" fill="#1e2430"/>
+  <path d="M60 606 a12 12 0 0 1 12 -12 h496 a12 12 0 0 1 12 12 v30 h-520 z" fill="#2a313f"/>
+  <circle cx="82" cy="621" r="5" fill="#ff5f57"/><circle cx="98" cy="621" r="5" fill="#febc2e"/><circle cx="114" cy="621" r="5" fill="#28c840"/>
+  <text x="134" y="626" font-size="13" fill="#c9d1da" class="m">test_user_manager.py</text>
+  <rect x="60" y="728" width="520" height="26" fill="#4a2226"/>
+  <g class="m" font-size="12.5">
+    <g fill="#5d6675" text-anchor="end"><text x="106" y="660">96</text><text x="106" y="686">98</text><text x="106" y="746">101</text></g>
+    <g fill="#4b5361" text-anchor="middle"><text x="100" y="716">⋮</text></g>
+    <text x="122" y="660"><tspan fill="#c678dd">def</tspan><tspan fill="#61afef"> test_admin_…</tspan><tspan fill="#c9d1da">(self):</tspan></text>
+    <text x="146" y="686"><tspan fill="#c9d1da">result = </tspan><tspan fill="#61afef">user_rank</tspan><tspan fill="#c9d1da">({…})</tspan></text>
+    <text x="146" y="746"><tspan fill="#c678dd">assert</tspan><tspan fill="#c9d1da"> (result[</tspan><tspan fill="#98c379">"rank"</tspan><tspan fill="#c9d1da">] == </tspan><tspan fill="#98c379">"S"</tspan><tspan fill="#c9d1da">, </tspan><tspan fill="#98c379">"…"</tspan><tspan fill="#c9d1da">)</tspan></text>
+  </g>
+  <circle cx="556" cy="741" r="11" fill="#e06c75"/><text x="556" y="746" text-anchor="middle" font-size="12" font-weight="700" fill="#1e2430">3</text>
+
+  <!-- ============ 第 1 段 ============ -->
+  <rect x="630" y="132" width="510" height="26" rx="6" fill="#fee2e2"/>
+  <text x="644" y="150" font-size="14" font-weight="700" fill="#991b1b">① 〜 ③ ｜ 認証情報の直書きと、通ってしまうテスト</text>
+
+  <rect x="630" y="166" width="510" height="100" rx="10" fill="#fff5f5" stroke="#fbcaca"/>
+  <rect x="630" y="166" width="6" height="100" rx="3" fill="#dc2626"/>
+  <circle cx="668" cy="200" r="14" fill="#dc2626"/><text x="668" y="206" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">1</text>
+  <text x="694" y="206" font-size="17" font-weight="700" fill="#111827">API キーのハードコード</text>
+  <text x="694" y="230" font-size="12.5" fill="#6b7280" class="m">python:S6418 ／ user_manager.py:40</text>
+  <rect x="694" y="240" width="96" height="22" rx="11" fill="#fee2e2"/><text x="742" y="255" text-anchor="middle" font-size="11.5" font-weight="700" fill="#991b1b">セキュリティ</text>
+
+  <rect x="630" y="276" width="510" height="100" rx="10" fill="#fff5f5" stroke="#fbcaca"/>
+  <rect x="630" y="276" width="6" height="100" rx="3" fill="#dc2626"/>
+  <circle cx="668" cy="310" r="14" fill="#dc2626"/><text x="668" y="316" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">2</text>
+  <text x="694" y="316" font-size="17" font-weight="700" fill="#111827">パスワードのハードコード</text>
+  <text x="694" y="340" font-size="12.5" fill="#6b7280" class="m">python:S2068 ／ user_manager.py:51</text>
+  <rect x="694" y="350" width="96" height="22" rx="11" fill="#fee2e2"/><text x="742" y="365" text-anchor="middle" font-size="11.5" font-weight="700" fill="#991b1b">セキュリティ</text>
+
+  <rect x="630" y="386" width="510" height="100" rx="10" fill="#fff5f5" stroke="#fbcaca"/>
+  <rect x="630" y="386" width="6" height="100" rx="3" fill="#dc2626"/>
+  <circle cx="668" cy="420" r="14" fill="#dc2626"/><text x="668" y="426" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">3</text>
+  <text x="694" y="426" font-size="17" font-weight="700" fill="#111827">いつも成功してしまう assert</text>
+  <text x="694" y="450" font-size="12.5" fill="#6b7280" class="m">python:S5905 ／ test_user_manager.py:101</text>
+  <rect x="694" y="460" width="56" height="22" rx="11" fill="#ffedd5"/><text x="722" y="475" text-anchor="middle" font-size="11.5" font-weight="700" fill="#9a3412">バグ</text>
+  <rect x="758" y="460" width="132" height="22" rx="11" fill="#eef4ff"/><text x="824" y="475" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e3a8a">テストコードでも同じ</text>
+
+  <!-- ============ 第 2 段 ============ -->
+  <rect x="630" y="508" width="510" height="26" rx="6" fill="#fef3c7"/>
+  <text x="644" y="526" font-size="14" font-weight="700" fill="#92400e">④ ⑤ ｜ 危険な API の呼び出しと、深すぎるネスト</text>
+
+  <rect x="630" y="542" width="510" height="100" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+  <rect x="630" y="542" width="6" height="100" rx="3" fill="#d97706"/>
+  <circle cx="668" cy="576" r="14" fill="#d97706"/><text x="668" y="582" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">4</text>
+  <text x="694" y="582" font-size="17" font-weight="700" fill="#111827">ZIP の無制限展開（Zip Bomb）</text>
+  <text x="694" y="606" font-size="12.5" fill="#6b7280" class="m">python:S5042 ／ user_manager.py:78</text>
+  <rect x="694" y="616" width="96" height="22" rx="11" fill="#fee2e2"/><text x="742" y="631" text-anchor="middle" font-size="11.5" font-weight="700" fill="#991b1b">セキュリティ</text>
+
+  <rect x="630" y="652" width="510" height="100" rx="10" fill="#fffbeb" stroke="#fcd34d"/>
+  <rect x="630" y="652" width="6" height="100" rx="3" fill="#d97706"/>
+  <circle cx="668" cy="686" r="14" fill="#d97706"/><text x="668" y="692" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">5</text>
+  <text x="694" y="692" font-size="17" font-weight="700" fill="#111827">制御構文のネストが深すぎる</text>
+  <text x="694" y="716" font-size="12.5" fill="#6b7280" class="m">python:S134 ／ user_manager.py:113</text>
+  <rect x="694" y="726" width="70" height="22" rx="11" fill="#e0e7ff"/><text x="729" y="741" text-anchor="middle" font-size="11.5" font-weight="700" fill="#3730a3">保守性</text>
+
+  <line x1="40" y1="828" x2="1160" y2="828" stroke="#eceff2"/>
+  <text x="600" y="858" text-anchor="middle" font-size="16" fill="#374151">5 件とも、計算しているのは手元の VS Code。<tspan font-weight="700" fill="#111827">コードは外に出ず、ファイルを開いた数秒後には指摘が並んでいる。</tspan></text>
+  <text x="600" y="884" text-anchor="middle" font-size="14.5" fill="#6b7280">判定に使うルールは 435 個すべてが拡張機能に同梱されている。push も、サーバー側の解析待ちも発生しない</text>
+</svg>

@@ -1,0 +1,265 @@
+<div style="border:3px solid #2271b1;background:#f0f6fc;padding:1.2em 1.4em;margin:0 0 2em;border-radius:6px;">
+<p style="margin:0 0 .7em;font-weight:700;color:#2271b1;font-size:1.05em;">【編集メモ】公開前に、このブロックを削除してください</p>
+<p style="margin:0 0 .4em;">本文中に<strong style="color:#d63638;">赤い破線の枠</strong>が 5 か所あります。それが画像の挿入位置です。枠の中にファイル名・キャプション・代替テキストが書いてあるので、その場所に「画像」ブロックを追加してファイルをアップロードし、<strong>赤枠のブロックごと削除</strong>してください。</p>
+<ol style="margin:.6em 0 .8em 1.4em;padding:0;">
+<li><code>01-overview.png</code> ── 「実際に何を検知するのか」の表の直後（記事の顔になる図）</li>
+<li><code>02-rules.png</code> ── 「既定のルールセット「Sonar way」…」の見出し直後</li>
+<li><code>03-file-map.png</code> ── 同じ章の末尾（「これが「最低ライン」の中身です」の段落の後）</li>
+<li><code>07-connected-compare.png</code> ── 巻末補足「同じコードでも、見える範囲を全員で揃えられる」の見出し直後</li>
+<li><code>04-connected-mode.png</code> ── 巻末補足「サーバーが解析してくれるようになるわけではない」の見出し直後</li>
+</ol>
+<p style="margin:0 0 .4em;"><strong>この記事では使わない図：</strong><code>05-sharing.png</code>（設定の配布手順の解説用）／<code>06-limits.png</code>（③ と同じ内容の別バージョン）</p>
+<p style="margin:0;"><strong style="color:#d63638;">もう 1 か所：</strong>冒頭の「先に結論だけ掴みたい方へ ── 図解版」ブロックの <code>href="#zukai"</code> を、図解ページ（<code>docs/analysis-reach.html</code>）を公開した URL に差し替えてください。このブロックは<strong>削除せず、そのまま公開します</strong>。</p>
+</div>
+
+<p><strong>SonarQube for IDE</strong> は、コードを書いているその瞬間に静的解析をかけるエディタ拡張機能です（旧称 SonarLint）。コミットも push も CI の完了待ちも要りません。しかもそれが、拡張機能を入れたチーム全員の手元で、同じ基準で起きます。</p>
+
+<p>この記事では、<strong>この拡張機能が何を見つけてくれるのか</strong>を、実際に問題を仕込んだ Python コードで確かめます。セキュリティ、バグ、保守性——種類の違う指摘が、ファイルを開いた数秒後に同時に並びます。</p>
+
+<div style="border:1px solid #ccd3da;border-left:5px solid #2271b1;background:#f6f8fa;padding:1.1em 1.3em;margin:2em 0;border-radius:6px;">
+<p style="margin:0 0 .5em;font-weight:700;font-size:1.02em;">先に結論だけ掴みたい方へ ── 図解版（3 分）</p>
+<p style="margin:0;">この記事の内容を、スクロールするだけで追える 1 枚の図解にまとめてあります。<strong>何が検知されるのか、なぜ書いた瞬間に出るのか、チームで使うと何が変わるのか</strong>——ここだけ見ても全体像がつかめます。<br /><a href="#zukai"><strong>&rarr; SonarQube for IDE は、何を見つけてくれるのか（図解版）</strong></a></p>
+</div>
+
+<hr class="wp-block-separator has-alpha-channel-opacity" />
+
+<h2 class="wp-block-heading">SonarQube for IDE とは何か</h2>
+
+<p>SonarQube for IDE は、SonarSource 社が提供するエディタ拡張機能です。以前は SonarLint という名前で知られていました。VS Code、IntelliJ IDEA などの JetBrains 製 IDE、Visual Studio、Eclipse に対応しています。</p>
+
+<p>役割を一言でいうと、<strong>コードレビューで指摘されるような問題を、レビューに出す前に、書いているその場で教えてくれる</strong>ツールです。バグ、セキュリティ上の問題、読みづらさにつながる書き方を、入力しながら赤い波線で示します。</p>
+
+<p>まず押さえておきたいのは、次の 1 点だけです。</p>
+
+<blockquote class="wp-block-quote"><p><strong>解析するプログラムそのものが、拡張機能の中に入っています。</strong><br />サーバーに質問を投げているのではなく、あなたの PC の上で動いています。</p></blockquote>
+
+<p>この 1 点から、以降で紹介する機能のほとんどが導かれます。</p>
+
+<h2 class="wp-block-heading">使い方は「入れて、開く」だけ</h2>
+
+<ol>
+<li>VS Code の拡張機能マーケットプレイスで「SonarQube for IDE」（発行元 SonarSource）を検索してインストールする</li>
+<li>プロジェクトのフォルダを開く</li>
+<li>ソースファイルを開く</li>
+</ol>
+
+<p>以上です。アカウント登録も、サーバーの用意も、設定ファイルの作成も要りません。開いた数秒後には、問題のある行に赤い波線が引かれ、VS Code の「問題（Problems）」タブに一覧が出ます。</p>
+
+<p>波線にカーソルを合わせると、<strong>何が問題で、なぜ直すべきで、どう直すのか</strong>が説明として表示されます。ルールによっては、その場で修正を適用できる Quick Fix（電球アイコン）も提供されます。</p>
+
+<hr class="wp-block-separator has-alpha-channel-opacity" />
+
+<h2 class="wp-block-heading">特徴 1：待ち時間がない（リアルタイム解析）</h2>
+
+<p>解析エンジンが手元にあるので、コードをどこかへ送って結果を待つ工程が存在しません。だから解析はキーを打つ速度に追いつきます。書いた瞬間に指摘が出て、直して保存すればその場で消えます。<strong>「指摘 → 修正 → 消える」が数秒で一周する</strong>のが、このツールの体験の中心です。</p>
+
+<p>これは単なる速さの話ではありません。指摘が出るのは<strong>まだ自分しか見ていないコードの上</strong>です。他人の目に触れる前、テストを走らせる前、コミットを積む前。つまり、直すのに一番コストがかからない瞬間に、直すべき場所が分かります。</p>
+
+<p>同じ問題を、レビューで指摘されてから直す場合と比べてみてください。指摘する側の時間、指摘される側の文脈の切り替え、修正コミットの追加、再レビュー。<strong>手戻りのコストは、見つかるのが遅いほど跳ね上がります。</strong>リアルタイム解析の価値は、ここにあります。</p>
+
+<h2 class="wp-block-heading">特徴 2：ソースコードが外に出ない</h2>
+
+<p>解析が手元で完結するということは、コードを送信する必要がないということです。<strong>ネットワークに繋がっていなくても解析は動きます。</strong>飛行機の中でも、閉じたネットワークの中でも、同じように指摘が出ます。</p>
+
+<p>ソースコードの外部送信に制約がある組織でも導入の検討がしやすい、という実務上のメリットにつながります。</p>
+
+<h2 class="wp-block-heading">特徴 3：全員の手元に同じルール表が入る</h2>
+
+<p>拡張機能を入れた人には、誰でも同じルールセットが入ります。ここが「個人の便利ツール」で終わらない理由です。</p>
+
+<p>コードレビューの品質は、どうしてもレビュアーによってばらつきます。誰が見ても指摘する問題もあれば、その日の忙しさによって見逃される問題もあります。チーム全員が SonarQube for IDE を入れている状態では、<strong>誰がどのファイルを書いても、最低ラインの解析が同じようにかかります</strong>。人ではなくツールが担保する部分ができる、ということです。</p>
+
+<hr class="wp-block-separator has-alpha-channel-opacity" />
+
+<h2 class="wp-block-heading">実際に何を検知するのか</h2>
+
+<p>ここからは、意図的に問題を仕込んだ Python コードで動きを見ていきます。使うのは 2 ファイルだけで、標準ライブラリしか使っていないため <code>pip install</code> も不要です。仕込んだ問題は 5 つ。<strong>秘密情報の漏洩、攻撃の入り口、テストの機能不全、読みづらいコード</strong>と、性格の違うものを並べてあります。</p>
+
+<figure class="wp-block-table"><table><thead><tr><th>#</th><th>検知される問題</th><th>ルール ID</th><th>種別</th></tr></thead><tbody><tr><td>1</td><td>API キーがソースに直書きされている</td><td><code>python:S6418</code></td><td>セキュリティ</td></tr><tr><td>2</td><td>DB のパスワードがソースに直書きされている</td><td><code>python:S2068</code></td><td>セキュリティ</td></tr><tr><td>3</td><td>ZIP を上限なしで展開している（Zip Bomb）</td><td><code>python:S5042</code></td><td>セキュリティ</td></tr><tr><td>4</td><td>いつも成功してしまう assert（テストコード）</td><td><code>python:S5905</code></td><td>バグ</td></tr><tr><td>5</td><td>制御構文のネストが深すぎる（<code>if</code> が 5 段）</td><td><code>python:S134</code></td><td>保守性</td></tr></tbody></table><figcaption class="wp-element-caption">2 ファイル・5 件。セキュリティもバグも保守性も、同じ 1 つの拡張機能が拾う</figcaption></figure>
+
+<div style="border:3px dashed #d63638;background:#fdf0f1;padding:1.2em 1.4em;margin:2em 0;border-radius:6px;">
+<p style="margin:0 0 .7em;font-weight:700;color:#d63638;font-size:1.05em;">画像 ①：ここに <code>01-overview.png</code> を挿入</p>
+<p style="margin:0 0 .4em;"><strong>ファイル：</strong><code>docs/figures/01-overview.png</code></p>
+<p style="margin:0 0 .4em;"><strong>キャプション：</strong>書いた瞬間に、ここまで見つかる。セキュリティもバグも保守性も 1 つの拡張機能で</p>
+<p style="margin:0 0 .4em;"><strong>代替テキスト：</strong>SonarQube for IDE が Python のサンプルコード 2 ファイルに出した 5 件の指摘（API キーの直書き、パスワードの直書き、Zip Bomb、いつも成功する assert、深すぎるネスト）を、セキュリティ・バグ・保守性の種別ごとに並べた図</p>
+<p style="margin:0;"><strong>配置：</strong>中央寄せ・大サイズ　／　画像を入れたら<strong>この赤枠ブロックごと削除</strong>してください</p>
+</div>
+
+<p>ここで見てほしいのは件数ではなく、<strong>指摘の種類がまたがっていること</strong>です。秘密情報を探すツール、バグを探すツール、コードの書き方を整えるツールを別々に入れなくても、1 つの拡張機能がまとめて面倒を見ています。1 件ずつ見ていきます。</p>
+
+<h3 class="wp-block-heading">① ② 認証情報がソースに直書きされている</h3>
+
+<pre class="wp-block-code"><code>API_KEY = "aB3xY9zQ7mK2pL5nR8tV4wC6dF1gH0jS"
+DB_PASSWORD = "kR7vQn2mXt9Bz4Lw"</code></pre>
+
+<p>この行は、打ち終わる前に波線が引かれます。面白いのは、変数名が <code>API_KEY</code> だから怒られているわけではない点です。文字列の中身の<strong>エントロピー（ランダムさ）</strong>まで見て、「これは人が読むための文字列ではなく、秘密の値らしい」と判定しています。</p>
+
+<p>秘密情報のハードコードは、一度コミットしてしまうと Git の履歴から完全に消すのが難しい種類の問題です。<strong>コミット前に気づけること自体に価値がある</strong>典型例といえます。</p>
+
+<h3 class="wp-block-heading">③ ZIP を上限なしで展開している（Zip Bomb）</h3>
+
+<pre class="wp-block-code"><code>zipfile.ZipFile(archive_path).extractall(UPLOAD_DIR)</code></pre>
+
+<p>展開後のサイズを確認せずに <code>extractall()</code> を呼ぶと、細工された ZIP でディスクを食い潰されます（Zip Bomb）。数十 KB のファイルが展開後に数十 GB になる、というものが作れます。</p>
+
+<p>この指摘は文字列の一致では出せません。<code>zipfile.ZipFile(...)</code> が返すオブジェクトの型を解決したうえで、そのオブジェクトに対する <code>extractall()</code> の呼び出しだと理解して出しています。<strong>コードの構造と型まで追いかけている</strong>、ということです。</p>
+
+<h3 class="wp-block-heading">④ いつも成功してしまう assert（テストコード）</h3>
+
+<pre class="wp-block-code"><code>assert (result["rank"] == "S", "管理者で高得点なら S になるはず")</code></pre>
+
+<p>括弧が作っているのは<strong>タプル</strong>です。空でないタプルは常に真なので、<strong>この assert は絶対に失敗しません</strong>。テストは実行され、PASS し、CI も緑になります。それでいて何も検査していません。</p>
+
+<p><strong>テストが緑である限り、CI もコードレビューも素通りする</strong>種類のバグです。気づける場所は、書いているエディタの中しか残っていません。括弧を 2 文字消して保存すれば、波線はその場で消えます。</p>
+
+<h3 class="wp-block-heading">⑤ 制御構文のネストが深すぎる</h3>
+
+<pre class="wp-block-code"><code>try:
+    if role == "admin":
+        if age &gt;= 18:
+            if country == "JP":
+                if score &gt;= 80:</code></pre>
+
+<p>動きはします。ただ、条件が 1 つ増えるたびに読み手の負担が跳ね上がり、修正のときにバグを埋め込みやすくなります。早期リターン（ガード節）で段数を減らすのが定石です。</p>
+
+<p>バグでもセキュリティ問題でもない、<strong>あとから効いてくる読みづらさ</strong>まで拾ってくれるのが、この手のツールを入れておく効果です。</p>
+
+<hr class="wp-block-separator has-alpha-channel-opacity" />
+
+<h2 class="wp-block-heading">既定のルールセット「Sonar way」が、チームの最低ラインになる</h2>
+
+<div style="border:3px dashed #d63638;background:#fdf0f1;padding:1.2em 1.4em;margin:2em 0;border-radius:6px;">
+<p style="margin:0 0 .7em;font-weight:700;color:#d63638;font-size:1.05em;">画像 ②：ここに <code>02-rules.png</code> を挿入</p>
+<p style="margin:0 0 .4em;"><strong>ファイル：</strong><code>docs/figures/02-rules.png</code></p>
+<p style="margin:0 0 .4em;"><strong>キャプション：</strong>Python アナライザには 435 ルールが同梱。設定ゼロでも 398 が有効になっている</p>
+<p style="margin:0 0 .4em;"><strong>代替テキスト：</strong>SonarQube for IDE の Python アナライザに同梱された 435 ルールのうち、既定で ON が 398、OFF が 37 であることを示す内訳図</p>
+<p style="margin:0;"><strong>配置：</strong>中央寄せ・大サイズ　／　画像を入れたら<strong>この赤枠ブロックごと削除</strong>してください</p>
+</div>
+
+<p>いま見た 5 件を判定したルールは、<strong>すべて拡張機能の中に最初から入っています</strong>。Python の解析エンジンには 435 個のルールが同梱されていて、そのうち 398 個が最初から ON。これが <strong>Sonar way</strong> という既定のルールセットです。</p>
+
+<p>残りの 37 個が OFF なのは、そのルールが間違っているからではありません。<strong>直すべきかどうかがチームによって変わる</strong>ルールだからです。ON にするのはチェックボックス 1 つで、解析エンジンを入れ替える必要も、コードを送る必要もありません。</p>
+
+<ul>
+<li><strong>ZIP の展開サイズ上限チェック（<code>python:S5042</code>）</strong> —— 外部からアップロードされる ZIP を扱うなら必須ですが、社内の信頼できるファイルしか読まない環境では過剰になりえます</li>
+<li><strong>制御構文のネストの深さ（<code>python:S134</code>）</strong> —— 何段まで許すかは、チームの好みそのものです</li>
+</ul>
+
+<p>裏を返すと、既定で ON になっている 398 個は<strong>どのチームでも「これは直すべき」と言えるものだけ</strong>が選ばれています。だから、何の設定も、社内での合意形成もなしに配れます。</p>
+
+<p>これが「最低ライン」の中身です。コーディング規約を作って周知して守らせる、という工程を踏まなくても、<strong>チーム全員がいきなりこの水準から書き始められます</strong>。導入コストの低さは、この製品のかなり大きな特徴だと思います。</p>
+
+<div style="border:3px dashed #d63638;background:#fdf0f1;padding:1.2em 1.4em;margin:2em 0;border-radius:6px;">
+<p style="margin:0 0 .7em;font-weight:700;color:#d63638;font-size:1.05em;">画像 ③：ここに <code>03-file-map.png</code> を挿入</p>
+<p style="margin:0 0 .4em;"><strong>ファイル：</strong><code>docs/figures/03-file-map.png</code></p>
+<p style="margin:0 0 .4em;"><strong>キャプション：</strong>仕込んだ 5 つの問題は、コードのここにある。判定しているのは 5 件とも手元の VS Code</p>
+<p style="margin:0 0 .4em;"><strong>代替テキスト：</strong>デモコード 2 ファイルのどの行に 5 つの問題があるかを、対応するルール ID・種別（セキュリティ／バグ／保守性）と並べて示した図</p>
+<p style="margin:0;"><strong>配置：</strong>中央寄せ・大サイズ　／　画像を入れたら<strong>この赤枠ブロックごと削除</strong>してください</p>
+</div>
+
+<hr class="wp-block-separator has-alpha-channel-opacity" />
+
+<h2 class="wp-block-heading">よくある質問</h2>
+
+<h3 class="wp-block-heading">SonarLint と SonarQube for IDE の違いは？</h3>
+
+<p>同じ製品です。SonarLint が SonarQube for IDE に名称変更されました。SonarQube ファミリーとして名前が統一された形で、機能が別物になったわけではありません。</p>
+
+<h3 class="wp-block-heading">ソースコードは外部に送信されますか？</h3>
+
+<p>送信されません。解析エンジンは拡張機能に同梱されていて、解析は開発者の PC 上で完結します。ネットワークに接続していない状態でも動作します。</p>
+
+<h3 class="wp-block-heading">SonarQube サーバーがないと使えませんか？</h3>
+
+<p>サーバーなしで使えます。拡張機能を入れてファイルを開くだけで、既定のルールセットによる解析が始まります。この記事で紹介した機能は、ほぼすべてサーバーなしの状態のものです。</p>
+
+<h3 class="wp-block-heading">SonarQube サーバーに繋ぐと何が変わりますか？</h3>
+
+<p>解析の走る場所は変わりません（引き続き手元の IDE です）。変わるのは<strong>チーム全員のルールが揃うこと</strong>です。サーバー側で 1 回決めた基準が各自の IDE に降りてきて、誰の環境でもまったく同じ指摘が出るようになります。詳しくは記事末尾の補足を参照してください。</p>
+
+<h3 class="wp-block-heading">対応している言語は？</h3>
+
+<p>Java、JavaScript / TypeScript、Python、C#、C / C++、PHP、Go、Kotlin、Ruby、HTML、CSS、Secrets（認証情報の検出）など、多数の言語に対応しています。対応状況は更新されるため、最新は公式ドキュメントを確認してください。</p>
+
+<h3 class="wp-block-heading">ESLint や Ruff のようなリンターと何が違いますか？</h3>
+
+<p>役割は重なります。大きな違いは、設定ファイルを書かなくても実用的な既定値がすぐ効くことと、指摘に「なぜ直すべきか」の解説が付いてくることです。併用しても構いません。</p>
+
+<hr class="wp-block-separator has-alpha-channel-opacity" />
+
+<h2 class="wp-block-heading">まとめ</h2>
+
+<ul>
+<li>SonarQube for IDE は、<strong>解析エンジンをエディタに内蔵した</strong>静的解析拡張機能（旧 SonarLint）</li>
+<li>使い方は<strong>入れて、開くだけ</strong>。アカウントもサーバーも設定ファイルも要らない</li>
+<li>だから<strong>待ち時間がなく</strong>、入力しながら指摘が出る。<strong>コードは外に出ない</strong></li>
+<li><strong>セキュリティもバグも保守性も</strong>、1 つの拡張機能がまとめて拾う</li>
+<li>指摘が出るのは<strong>まだ誰も見ていないコードの上</strong>。修正コストが一番低い瞬間に分かる</li>
+<li>既定の <strong>Sonar way</strong> が、設定ゼロで<strong>チーム全体の最低ライン</strong>になる</li>
+<li>サーバーに繋げば、<strong>全開発者にまったく同じ品質基準・セキュリティ基準を効かせられる</strong></li>
+</ul>
+
+<p>「テストは緑なのに何も守っていない」ような問題は、CI もレビューもすり抜けます。そういうものを拾える場所が、書いているエディタの中にある——これが SonarQube for IDE のいちばん分かりやすい価値だと思います。</p>
+
+<hr class="wp-block-separator has-alpha-channel-opacity" />
+
+<h2 class="wp-block-heading">補足：全開発者に、まったく同じ基準を効かせる（Connected Mode）</h2>
+
+<p>ここまではサーバーなしの話です。実際に使い始めると、「このルールも有効にしよう」「この指摘は自分たちには要らない」という話が必ず出てきます。</p>
+
+<p>問題は、その決めごとが<strong>各自が手元で設定しない限り、誰の IDE にも効かない</strong>ことです。会議で決めても、設定するのは半分。新しく入った人の環境は誰も知らない。こうして、同じチームの中に「厳しい人の環境」と「緩い人の環境」ができていきます。</p>
+
+<p>SonarQube サーバー（または SonarQube Cloud）のプロジェクトと IDE を紐づける（バインドする）と、<strong>サーバー側で決めた品質プロファイルが、そのまま各自の IDE に降りてきます</strong>。これが Connected Mode です。</p>
+
+<blockquote class="wp-block-quote"><p><strong>サーバー側で 1 回決めれば、バインドしている開発者全員の IDE が、まったく同じルール・まったく同じ深刻度で動きます。</strong><br />コード品質とセキュリティの基準を、人に依存させずに全員へ揃えられる、ということです。</p></blockquote>
+
+<p>効き方は 3 方向あります。</p>
+
+<ul>
+<li><strong>底上げ。</strong>「うちは外部から ZIP を受け取るので Zip Bomb のルールは必須」と決めれば、全員のエディタに同じ日から効きます</li>
+<li><strong>ノイズ削減。</strong>「この指摘は対応しない」と決めたルールを OFF にすれば、全員のエディタから一斉に消えます。判断を各自が抱え込まずに済みます</li>
+<li><strong>新メンバーの初日から。</strong>バインドした時点で、その人の環境はチームの基準そのものになります。規約集を読ませて覚えてもらう工程が要りません</li>
+</ul>
+
+<p>レビューでばらつくのは、レビュアーの厳しさだけではありません。<strong>そもそも各自のエディタが違うものを見ている</strong>状態を、1 か所の設定で解消できるのが Connected Mode です。</p>
+
+<h3 class="wp-block-heading">同じコードでも、見える範囲を全員で揃えられる</h3>
+
+<div style="border:3px dashed #d63638;background:#fdf0f1;padding:1.2em 1.4em;margin:2em 0;border-radius:6px;">
+<p style="margin:0 0 .7em;font-weight:700;color:#d63638;font-size:1.05em;">画像 ④：ここに <code>07-connected-compare.png</code> を挿入</p>
+<p style="margin:0 0 .4em;"><strong>ファイル：</strong><code>docs/figures/07-connected-compare.png</code></p>
+<p style="margin:0 0 .4em;"><strong>キャプション：</strong>同じコード・同じエンジン。違うのは、チームで決めたルールが効いているかどうかだけ</p>
+<p style="margin:0 0 .4em;"><strong>代替テキスト：</strong>未連携の IDE では既定ルールによる 3 件、Connected Mode ではチームのプロファイルが効いて 5 件の指摘が出ることを、同じコードで並べて比較した図</p>
+<p style="margin:0;"><strong>配置：</strong>中央寄せ・大サイズ　／　画像を入れたら<strong>この赤枠ブロックごと削除</strong>してください</p>
+</div>
+
+<p>今回のデモで、既定の <code>Sonar way</code> を継承したプロファイルを作り、OFF だったルールをすべて有効にして紐づけてみました。<code>user_manager.py</code> 1 ファイルで見た結果は次のとおりです。</p>
+
+<figure class="wp-block-table"><table><thead><tr><th></th><th>有効な Python ルール</th><th><code>user_manager.py</code> の指摘</th></tr></thead><tbody><tr><td>各自の既定のまま</td><td>387</td><td>2 件</td></tr><tr><td>チームのプロファイルを配った状態</td><td>443</td><td><strong>9 件</strong></td></tr></tbody></table><figcaption class="wp-element-caption">同じファイル・同じコードのまま、チームで決めた基準がそのまま手元に効く</figcaption></figure>
+
+<p>コードは 1 文字も変えていません。増えたのは <strong>ZIP の展開サイズを制御していない箇所</strong>や<strong>制御構文のネストが深すぎる箇所</strong>のような、「直すべきかどうかがチームによって変わる」領域の指摘です。大事なのは件数そのものではなく、<strong>この 9 件が、バインドした全員のエディタに等しく出ている</strong>ことのほうです。</p>
+
+<h3 class="wp-block-heading">サーバーが解析してくれるようになるわけではない</h3>
+
+<div style="border:3px dashed #d63638;background:#fdf0f1;padding:1.2em 1.4em;margin:2em 0;border-radius:6px;">
+<p style="margin:0 0 .7em;font-weight:700;color:#d63638;font-size:1.05em;">画像 ⑤：ここに <code>04-connected-mode.png</code> を挿入</p>
+<p style="margin:0 0 .4em;"><strong>ファイル：</strong><code>docs/figures/04-connected-mode.png</code></p>
+<p style="margin:0 0 .4em;"><strong>キャプション：</strong>Connected Mode でも解析は手元で走る。降りてくるのはルール設定だけ</p>
+<p style="margin:0 0 .4em;"><strong>代替テキスト：</strong>Connected Mode では解析はローカルの IDE で走り続け、サーバーからは品質プロファイル（ルール設定）だけが同期されることを示した図</p>
+<p style="margin:0;"><strong>配置：</strong>中央寄せ・大サイズ　／　画像を入れたら<strong>この赤枠ブロックごと削除</strong>してください</p>
+</div>
+
+<p>ここで注意したいのは、<strong>「サーバーが解析してくれるようになる」わけではない</strong>点です。解析は相変わらず手元の IDE で走っています。降りてくるのは「どのルールを ON にするか」という設定だけなので、push もサーバー側の解析待ちも発生しません。<strong>コードが外に出ないことも、待ち時間がないことも、そのまま維持されます。</strong></p>
+
+<p>実務的な注意点をひとつだけ。<strong>ルール設定の同期はリアルタイムではありません。</strong>サーバー側でルールを変えても、その瞬間に全員の波線が変わるわけではなく、IDE の起動時などのタイミングで降りてきます。「次にエディタを開いたときから、全員に効く」と考えておくのが正確です。</p>
+
+<p>まずはサーバーなしで入れてみて、チームで基準を揃えたくなったら繋ぐ。<strong>どちらの段階でも、解析は手元で、書いた瞬間に走ります。</strong></p>
+
+<h3 class="wp-block-heading">参考リンク</h3>
+
+<ul>
+<li><a href="https://docs.sonarsource.com/sonarqube-for-vs-code/" target="_blank" rel="noopener">SonarQube for VS Code 公式ドキュメント</a></li>
+<li><a href="https://rules.sonarsource.com/python/" target="_blank" rel="noopener">Python ルール一覧（Sonar Rules）</a></li>
+<li><a href="https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarlint-vscode" target="_blank" rel="noopener">VS Code Marketplace: SonarQube for IDE</a></li>
+<li><a href="https://docs.sonarsource.com/sonarqube-for-vs-code/connect-your-ide/setup" target="_blank" rel="noopener">Connected Mode のセットアップ（補足）</a></li>
+</ul>

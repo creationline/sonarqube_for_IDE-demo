@@ -1,0 +1,6 @@
+{
+  "sonarlint.connectedMode.project": {
+    "connectionId": "creationline-test-02",
+    "projectKey": "creationline-test-02_sonarqube-for-ide-demo"
+  }
+}

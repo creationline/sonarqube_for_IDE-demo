@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" width="1200" height="800" font-family="'Hiragino Sans','Noto Sans JP','Yu Gothic',sans-serif">
+  <defs>
+    <style>.m{font-family:'SFMono-Regular',Menlo,Consolas,monospace}</style>
+    <filter id="sh" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#0b1220" flood-opacity="0.10"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="800" fill="#ffffff"/>
+
+  <text x="600" y="52" text-anchor="middle" font-size="30" font-weight="700" fill="#111827">書いた瞬間に、ここまで見つかる</text>
+  <text x="600" y="86" text-anchor="middle" font-size="17" fill="#6b7280">SonarQube for IDE が Python のサンプルコード 2 ファイルに出した指摘。セキュリティも、バグも、保守性も、まとめて 1 つの拡張機能が見ている</text>
+
+  <!-- ============ PROBLEMS PANEL ============ -->
+  <g filter="url(#sh)">
+    <rect x="60" y="116" width="1080" height="418" rx="14" fill="#ffffff" stroke="#e2e6ea"/>
+  </g>
+  <path d="M60 130 a14 14 0 0 1 14 -14 h1052 a14 14 0 0 1 14 14 v26 h-1080 z" fill="#f4f6f8"/>
+  <line x1="60" y1="156" x2="1140" y2="156" stroke="#e2e6ea"/>
+  <text x="88" y="142" font-size="12.5" font-weight="700" fill="#8b95a1" letter-spacing="1.2">PROBLEMS</text>
+  <rect x="176" y="128" width="26" height="20" rx="10" fill="#dc2626"/>
+  <text x="189" y="142" text-anchor="middle" font-size="12" font-weight="700" fill="#ffffff">5</text>
+  <text x="1112" y="142" text-anchor="end" font-size="12.5" fill="#8b95a1" class="m">user_manager.py ／ test_user_manager.py</text>
+
+  <!-- row 1 : security -->
+  <rect x="84" y="172" width="1032" height="64" rx="10" fill="#fff6f6" stroke="#fbcaca"/>
+  <rect x="84" y="172" width="6" height="64" rx="3" fill="#dc2626"/>
+  <circle cx="116" cy="204" r="11" fill="#dc2626"/>
+  <text x="116" y="209" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">!</text>
+  <text x="142" y="199" font-size="17" font-weight="700" fill="#111827">API キーがソースコードに直書きされている</text>
+  <text x="142" y="221" font-size="12.5" fill="#6b7280" class="m">python:S6418 ／ user_manager.py:40</text>
+  <rect x="946" y="191" width="150" height="26" rx="13" fill="#fee2e2"/>
+  <text x="1021" y="209" text-anchor="middle" font-size="13" font-weight="700" fill="#991b1b">セキュリティ</text>
+
+  <!-- row 2 : security -->
+  <rect x="84" y="244" width="1032" height="64" rx="10" fill="#fff6f6" stroke="#fbcaca"/>
+  <rect x="84" y="244" width="6" height="64" rx="3" fill="#dc2626"/>
+  <circle cx="116" cy="276" r="11" fill="#dc2626"/>
+  <text x="116" y="281" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">!</text>
+  <text x="142" y="271" font-size="17" font-weight="700" fill="#111827">DB のパスワードがソースコードに直書きされている</text>
+  <text x="142" y="293" font-size="12.5" fill="#6b7280" class="m">python:S2068 ／ user_manager.py:51</text>
+  <rect x="946" y="263" width="150" height="26" rx="13" fill="#fee2e2"/>
+  <text x="1021" y="281" text-anchor="middle" font-size="13" font-weight="700" fill="#991b1b">セキュリティ</text>
+
+  <!-- row 3 : security -->
+  <rect x="84" y="316" width="1032" height="64" rx="10" fill="#fff6f6" stroke="#fbcaca"/>
+  <rect x="84" y="316" width="6" height="64" rx="3" fill="#dc2626"/>
+  <circle cx="116" cy="348" r="11" fill="#dc2626"/>
+  <text x="116" y="353" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">!</text>
+  <text x="142" y="343" font-size="17" font-weight="700" fill="#111827">ZIP を展開サイズの上限なしで展開している（Zip Bomb）</text>
+  <text x="142" y="365" font-size="12.5" fill="#6b7280" class="m">python:S5042 ／ user_manager.py:78</text>
+  <rect x="946" y="335" width="150" height="26" rx="13" fill="#fee2e2"/>
+  <text x="1021" y="353" text-anchor="middle" font-size="13" font-weight="700" fill="#991b1b">セキュリティ</text>
+
+  <!-- row 4 : bug -->
+  <rect x="84" y="388" width="1032" height="64" rx="10" fill="#fffaf2" stroke="#fcd9a8"/>
+  <rect x="84" y="388" width="6" height="64" rx="3" fill="#ea580c"/>
+  <circle cx="116" cy="420" r="11" fill="#ea580c"/>
+  <text x="116" y="425" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">!</text>
+  <text x="142" y="415" font-size="17" font-weight="700" fill="#111827">いつも成功してしまう assert（テストが通っても何も検査していない）</text>
+  <text x="142" y="437" font-size="12.5" fill="#6b7280" class="m">python:S5905 ／ test_user_manager.py:101</text>
+  <rect x="946" y="407" width="150" height="26" rx="13" fill="#ffedd5"/>
+  <text x="1021" y="425" text-anchor="middle" font-size="13" font-weight="700" fill="#9a3412">バグ</text>
+
+  <!-- row 5 : maintainability -->
+  <rect x="84" y="460" width="1032" height="64" rx="10" fill="#f7f8ff" stroke="#c7d2fe"/>
+  <rect x="84" y="460" width="6" height="64" rx="3" fill="#4f46e5"/>
+  <circle cx="116" cy="492" r="11" fill="#4f46e5"/>
+  <text x="116" y="497" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">!</text>
+  <text x="142" y="487" font-size="17" font-weight="700" fill="#111827">制御構文のネストが深すぎる（if が 5 段）</text>
+  <text x="142" y="509" font-size="12.5" fill="#6b7280" class="m">python:S134 ／ user_manager.py:113</text>
+  <rect x="946" y="479" width="150" height="26" rx="13" fill="#e0e7ff"/>
+  <text x="1021" y="497" text-anchor="middle" font-size="13" font-weight="700" fill="#3730a3">保守性</text>
+
+  <!-- ============ CATEGORY CARDS ============ -->
+  <rect x="60" y="562" width="340" height="112" rx="12" fill="#fff6f6" stroke="#fbcaca"/>
+  <rect x="84" y="586" width="118" height="26" rx="13" fill="#fee2e2"/>
+  <text x="143" y="604" text-anchor="middle" font-size="13" font-weight="700" fill="#991b1b">セキュリティ</text>
+  <text x="84" y="634" font-size="14.5" fill="#374151">秘密情報の直書き、外部入力を</text>
+  <text x="84" y="656" font-size="14.5" fill="#374151">信用しきった危険な処理</text>
+
+  <rect x="430" y="562" width="340" height="112" rx="12" fill="#fffaf2" stroke="#fcd9a8"/>
+  <rect x="454" y="586" width="70" height="26" rx="13" fill="#ffedd5"/>
+  <text x="489" y="604" text-anchor="middle" font-size="13" font-weight="700" fill="#9a3412">バグ</text>
+  <text x="454" y="634" font-size="14.5" fill="#374151">動いてしまうから気づけない、</text>
+  <text x="454" y="656" font-size="14.5" fill="#374151">意図と食い違った書き方</text>
+
+  <rect x="800" y="562" width="340" height="112" rx="12" fill="#f7f8ff" stroke="#c7d2fe"/>
+  <rect x="824" y="586" width="82" height="26" rx="13" fill="#e0e7ff"/>
+  <text x="865" y="604" text-anchor="middle" font-size="13" font-weight="700" fill="#3730a3">保守性</text>
+  <text x="824" y="634" font-size="14.5" fill="#374151">読みづらさ・壊しやすさに</text>
+  <text x="824" y="656" font-size="14.5" fill="#374151">つながるコードの構造</text>
+
+  <!-- ============ FOOTER ============ -->
+  <line x1="40" y1="708" x2="1160" y2="708" stroke="#eceff2"/>
+  <text x="600" y="742" text-anchor="middle" font-size="18" fill="#374151">解析エンジンは拡張機能に同梱。<tspan font-weight="700" fill="#111827">コードは 1 バイトも外に出ず、キーを打つそばから指摘が出る。</tspan></text>
+  <text x="600" y="772" text-anchor="middle" font-size="14" fill="#9aa3ad">Python ／ Java ／ JavaScript・TypeScript ／ C# ／ C・C++ ／ PHP ／ Go ／ Kotlin ／ Ruby ／ HTML ／ CSS ／ Secrets ── ほか多数の言語に対応</text>
+</svg>

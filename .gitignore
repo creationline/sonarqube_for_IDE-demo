@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+app.db
+*.png
+
+# 図版の PNG だけは追跡する（デモ中に撮るスクリーンショットは対象外）
+!docs/figures/*.png

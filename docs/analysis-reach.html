@@ -1,0 +1,679 @@
+<title>リアルタイム解析ツール SonarQube for IDE とは</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@500;700;900&family=IBM+Plex+Sans+JP:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ============ tokens ============ */
+:root{
+  --ground:#F5F4F9; --surface:#FFFFFF; --surface-2:#ECEAF4; --line:#DAD7E6;
+  --ink:#1A1830; --ink-2:#4A4664; --ink-3:#6E6A88;
+  --primary:#3B4D9E; --primary-soft:#E6E8F6; --primary-line:#B9C0E6;
+  --amber:#A96412; --amber-soft:#F7EEDF; --amber-line:#E3C99B;
+  --red:#A93526; --red-soft:#F8E7E4; --red-line:#E4B4AC;
+  --teal:#16705F; --teal-soft:#E0F0EB; --teal-line:#A6D2C6;
+  --code-bg:#211F33; --code-ink:#E8E6F5; --code-dim:#7C7799;
+  --shadow:0 1px 2px rgba(26,24,48,.05), 0 8px 24px -12px rgba(26,24,48,.18);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#14132A; --surface:#211E3C; --surface-2:#1A1834; --line:#39355C;
+    --ink:#EFEDFA; --ink-2:#C2BDDA; --ink-3:#A29DBF;
+    --primary:#A3B0F7; --primary-soft:#262B57; --primary-line:#4B5192;
+    --amber:#EDB673; --amber-soft:#342712; --amber-line:#77592C;
+    --red:#F09385; --red-soft:#37211D; --red-line:#7C443C;
+    --teal:#6BD3BA; --teal-soft:#16302A; --teal-line:#2F7361;
+    --code-bg:#0C0B18; --code-ink:#EAE8F6; --code-dim:#8A85AB;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 30px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#14132A; --surface:#211E3C; --surface-2:#1A1834; --line:#39355C;
+  --ink:#EFEDFA; --ink-2:#C2BDDA; --ink-3:#A29DBF;
+  --primary:#A3B0F7; --primary-soft:#262B57; --primary-line:#4B5192;
+  --amber:#EDB673; --amber-soft:#342712; --amber-line:#77592C;
+  --red:#F09385; --red-soft:#37211D; --red-line:#7C443C;
+  --teal:#6BD3BA; --teal-soft:#16302A; --teal-line:#2F7361;
+  --code-bg:#0C0B18; --code-ink:#EAE8F6; --code-dim:#8A85AB;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 12px 30px -16px rgba(0,0,0,.8);
+}
+
+/* ============ base ============ */
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:"IBM Plex Sans JP","Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  font-size:16px; line-height:1.9; -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{font-family:"Zen Kaku Gothic New","Hiragino Sans",system-ui,sans-serif; text-wrap:balance; margin:0}
+p{margin:0}
+a{color:var(--primary)}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+
+.wrap{max-width:760px; margin:0 auto; padding:0 24px}
+.wide{max-width:1060px; margin:0 auto; padding:0 24px}
+section{padding:76px 0}
+.stack{display:flex; flex-direction:column; gap:22px}
+.stack-lg{display:flex; flex-direction:column; gap:34px}
+
+/* ============ gutter rail ============ */
+.rail{
+  position:fixed; left:0; top:0; height:100vh; width:104px; z-index:20;
+  display:none; align-items:center; justify-content:flex-end;
+  pointer-events:none;
+}
+.rail-inner{display:flex; flex-direction:column; gap:2px; padding-right:18px; text-align:right}
+.rail-item{
+  font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.08em;
+  color:var(--ink-3); opacity:.72; padding:5px 0; border-right:2px solid transparent;
+  padding-right:12px; transition:opacity .3s, color .3s, border-color .3s;
+  white-space:nowrap;
+}
+.rail-item .n{display:inline-block; min-width:1.6em; color:var(--ink-3)}
+.rail-item.on{opacity:1; color:var(--ink); font-weight:500; border-right-color:var(--primary)}
+.rail-item.on .n{color:var(--primary)}
+@media (min-width:1200px){ .rail{display:flex} }
+
+/* ============ hero ============ */
+.hero{padding:96px 0 68px; border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--primary); font-weight:500;
+}
+h1{font-size:clamp(30px,5.4vw,50px); font-weight:900; line-height:1.32; letter-spacing:-.01em; margin:16px 0 0}
+.lede{font-size:18px; color:var(--ink-2); margin-top:22px; max-width:62ch}
+.hero-counts{display:flex; gap:0; margin-top:40px; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface)}
+.hc{flex:1; padding:18px 16px; border-right:1px solid var(--line)}
+.hc:last-child{border-right:0}
+.hc .k{font-size:12px; color:var(--ink-3); letter-spacing:.04em}
+.hc .v{font-family:"IBM Plex Mono",monospace; font-size:28px; font-weight:500; line-height:1.3; font-variant-numeric:tabular-nums}
+.hc .u{font-size:12px; color:var(--ink-3)}
+.hc.s1 .v{color:var(--teal)} .hc.s2 .v{color:var(--primary)} .hc.s3 .v{color:var(--amber)}
+
+/* ============ section headings ============ */
+.sec-head{display:flex; gap:16px; align-items:flex-start; margin-bottom:8px}
+.sec-num{
+  font-family:"IBM Plex Mono",monospace; font-size:12px; font-weight:500; letter-spacing:.1em;
+  color:var(--primary); background:var(--primary-soft); border:1px solid var(--primary-line);
+  border-radius:5px; padding:3px 9px; margin-top:9px; white-space:nowrap;
+}
+h2{font-size:clamp(23px,3.4vw,31px); font-weight:900; line-height:1.45; letter-spacing:-.005em}
+.sub{color:var(--ink-2); margin-top:14px}
+
+/* ============ cards / panels ============ */
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:24px; box-shadow:var(--shadow)}
+.panel-flat{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:22px}
+.panel h3{font-size:17px; font-weight:700; margin-bottom:10px}
+
+/* ============ engine diagram ============ */
+.machine{display:grid; grid-template-columns:1fr auto 1fr; gap:0; align-items:stretch; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:var(--surface)}
+.machine .col{padding:24px 22px}
+.machine .divider{width:1px; background:var(--line)}
+.mtag{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.machine h3{font-size:16px; margin:8px 0 8px}
+.machine p{font-size:14px; color:var(--ink-2); line-height:1.85}
+.machine .col.local{background:var(--teal-soft)}
+.machine .col.local h3{color:var(--teal)}
+@media (max-width:700px){
+  .machine{grid-template-columns:1fr}
+  .machine .divider{width:auto; height:1px}
+}
+.icon{width:22px; height:22px; stroke:currentColor; fill:none; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; flex:none}
+.icon-sm{width:16px; height:16px}
+
+.noflow{
+  display:flex; gap:12px; align-items:flex-start; margin-top:18px;
+  background:var(--red-soft); border:1px solid var(--red-line); border-radius:10px; padding:14px 16px;
+}
+.noflow .icon{color:var(--red); margin-top:3px}
+.noflow p{font-size:14px; color:var(--ink); line-height:1.8}
+
+/* ============ finding cards ============ */
+.finds{display:flex; flex-direction:column; gap:12px}
+.find{
+  background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--amber);
+  border-radius:9px; padding:16px 18px;
+}
+.find.prev{border-left-color:var(--line); background:transparent; opacity:.62}
+.find.blocked{border-left-color:var(--red)}
+.find-head{display:flex; align-items:center; gap:9px; flex-wrap:wrap; margin-bottom:7px}
+.chip{
+  font-family:"IBM Plex Mono",monospace; font-size:11.5px; font-weight:500;
+  background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:1px 7px; color:var(--ink-2);
+}
+.sev{font-size:11px; letter-spacing:.06em; font-weight:600; padding:1px 7px; border-radius:4px}
+.sev.blocker{background:var(--red-soft); color:var(--red); border:1px solid var(--red-line)}
+.sev.major{background:var(--amber-soft); color:var(--amber); border:1px solid var(--amber-line)}
+.tag-new{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em; color:var(--primary); border:1px solid var(--primary-line); background:var(--primary-soft); border-radius:4px; padding:1px 6px}
+.tag-old{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.1em; color:var(--ink-3); border:1px solid var(--line); border-radius:4px; padding:1px 6px}
+.find-title{font-weight:600; font-size:15.5px; line-height:1.7}
+.find-why{font-size:13.5px; color:var(--ink-2); margin-top:8px; line-height:1.85}
+
+pre.code{
+  background:var(--code-bg); color:var(--code-ink); border-radius:7px;
+  padding:12px 14px; margin:11px 0 0; overflow-x:auto;
+  font-family:"IBM Plex Mono",monospace; font-size:13px; line-height:1.75;
+}
+pre.code .ln{color:var(--code-dim); user-select:none; display:inline-block; min-width:2.6em; text-align:right; margin-right:14px}
+pre.code .hl{color:#FFB86B}
+pre.code .cm{color:var(--code-dim)}
+
+/* ============ scope strip ============ */
+.scope{display:flex; align-items:center; gap:14px; padding:15px 18px; border-radius:10px; background:var(--surface); border:1px solid var(--line); font-size:14px; color:var(--ink-2)}
+.scope .icon{color:var(--primary)}
+.scope b{color:var(--ink); font-weight:600}
+
+/* ============ connected mode flow ============ */
+.flow2{display:grid; grid-template-columns:1fr 116px 1fr; align-items:center; gap:0; border:1px solid var(--line); border-radius:12px; background:var(--surface); overflow:hidden}
+.flow2 .end{padding:22px 20px}
+.flow2 .mid{padding:16px 8px; text-align:center; border-left:1px solid var(--line); border-right:1px solid var(--line); background:var(--surface-2); align-self:stretch; display:flex; flex-direction:column; justify-content:center; gap:10px}
+.flow2 h3{font-size:15px; margin-bottom:6px}
+.flow2 p{font-size:13.5px; color:var(--ink-2); line-height:1.8}
+.arrowlbl{font-family:"IBM Plex Mono",monospace; font-size:11px; letter-spacing:.06em; color:var(--primary)}
+.arrow-down{color:var(--primary)}
+.arrow-x{color:var(--red)}
+@media (max-width:700px){ .flow2{grid-template-columns:1fr} .flow2 .mid{border-left:0; border-right:0; border-top:1px solid var(--line); border-bottom:1px solid var(--line)} }
+
+.same{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px}
+.same .cell{background:var(--teal-soft); border:1px solid var(--teal-line); border-radius:9px; padding:14px}
+.same .cell .k{font-size:11.5px; color:var(--teal); font-family:"IBM Plex Mono",monospace; letter-spacing:.06em}
+.same .cell .v{font-size:14px; font-weight:600; margin-top:4px; line-height:1.6}
+@media (max-width:700px){ .same{grid-template-columns:1fr} }
+
+/* ============ step chase ============ */
+.chase{background:var(--code-bg); border-radius:14px; padding:28px 24px; overflow-x:auto}
+.chase-title{font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.12em; color:var(--code-dim); text-transform:uppercase; margin-bottom:20px}
+.hop{display:grid; grid-template-columns:32px 1fr; gap:16px; align-items:start; opacity:.22; transition:opacity .45s ease}
+.hop.lit{opacity:1}
+.hop .dot{display:flex; flex-direction:column; align-items:center; gap:4px; padding-top:4px}
+.hop .dot i{width:9px; height:9px; border-radius:50%; background:var(--code-dim); display:block; transition:background .45s, box-shadow .45s}
+.hop.lit .dot i{background:#FFB86B; box-shadow:0 0 0 4px rgba(255,184,107,.18)}
+.hop.lit.sink .dot i{background:#FF7B6B; box-shadow:0 0 0 4px rgba(255,123,107,.2)}
+.hop .line{width:1px; flex:1; min-height:26px; background:#3A3752}
+.hop:last-child .line{display:none}
+.hop .body{padding-bottom:8px}
+.hop .role{font-family:"IBM Plex Mono",monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#FFB86B}
+.hop.sink .role{color:#FF7B6B}
+.hop .src{font-family:"IBM Plex Mono",monospace; font-size:13.5px; color:var(--code-ink); margin-top:3px; white-space:pre}
+.hop .note{font-size:13px; color:#A9A3C6; margin-top:5px; line-height:1.8}
+
+/* ============ comparison table ============ */
+.tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--surface)}
+table{border-collapse:collapse; width:100%; min-width:660px; font-size:14px}
+th,td{text-align:left; padding:14px 16px; border-bottom:1px solid var(--line); vertical-align:top; line-height:1.75}
+thead th{background:var(--surface-2); font-weight:700; font-size:13px; white-space:nowrap}
+tbody th{font-weight:600; color:var(--ink-2); white-space:nowrap; font-size:13.5px}
+tr:last-child td, tr:last-child th{border-bottom:0}
+td.same-cell{background:var(--teal-soft); color:var(--teal); font-weight:600}
+td.chg{background:var(--amber-soft); color:var(--amber); font-weight:600}
+.count{font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums; font-weight:500}
+
+/* ============ limits ============ */
+.limits{display:flex; flex-direction:column; gap:14px}
+.limit{display:grid; grid-template-columns:24px 1fr; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 20px}
+.limit .icon{color:var(--ink-3); margin-top:4px}
+.limit h3{font-size:15.5px; margin-bottom:6px}
+.limit p{font-size:14px; color:var(--ink-2); line-height:1.85}
+
+/* ============ sources ============ */
+.sources{border-top:1px solid var(--line); padding-top:34px}
+.srclist{display:flex; flex-direction:column; gap:10px; margin-top:18px}
+.srclist a{display:flex; gap:11px; align-items:baseline; text-decoration:none; padding:11px 14px; border:1px solid var(--line); border-radius:8px; background:var(--surface); transition:border-color .2s, background .2s}
+.srclist a:hover, .srclist a:focus-visible{border-color:var(--primary); background:var(--primary-soft)}
+.srclist .t{font-size:14px; font-weight:600; color:var(--ink)}
+.srclist .u{font-family:"IBM Plex Mono",monospace; font-size:11.5px; color:var(--ink-3); word-break:break-all}
+:focus-visible{outline:2px solid var(--primary); outline-offset:2px}
+
+footer{padding:44px 0 72px; color:var(--ink-3); font-size:12.5px; line-height:1.9}
+
+/* ============ reveal ============ */
+.rv{opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease}
+.rv.in{opacity:1; transform:none}
+@media (prefers-reduced-motion:reduce){
+  .rv{opacity:1; transform:none; transition:none}
+  .hop{opacity:1; transition:none}
+}
+
+/* ============ kind chips ============ */
+.kind{font-size:11.5px; font-weight:600; letter-spacing:.04em; padding:1px 8px; border-radius:4px; white-space:nowrap}
+.kind.sec{background:var(--red-soft); color:var(--red); border:1px solid var(--red-line)}
+.kind.bug{background:var(--amber-soft); color:var(--amber); border:1px solid var(--amber-line)}
+.kind.mnt{background:var(--primary-soft); color:var(--primary); border:1px solid var(--primary-line)}
+.find.k-sec{border-left-color:var(--red)}
+.find.k-bug{border-left-color:var(--amber)}
+.find.k-mnt{border-left-color:var(--primary)}
+.legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:2px}
+.legend .lg{display:flex; gap:9px; align-items:baseline; flex:1 1 220px; background:var(--surface); border:1px solid var(--line); border-radius:9px; padding:12px 14px}
+.legend .lg p{font-size:13px; color:var(--ink-2); line-height:1.75}
+.wins{display:flex; flex-direction:column; gap:14px}
+.win{display:grid; grid-template-columns:24px 1fr; gap:14px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 20px}
+.win .icon{color:var(--primary); margin-top:4px}
+.win h3{font-size:15.5px; margin-bottom:6px}
+.win p{font-size:14px; color:var(--ink-2); line-height:1.85}
+.claim{background:var(--teal-soft); border:1px solid var(--teal-line); border-radius:12px; padding:22px 24px}
+.claim p{font-size:16.5px; line-height:1.85; font-weight:600}
+.claim p.s{font-size:14px; font-weight:400; color:var(--ink-2); margin-top:8px}
+</style>
+<nav class="rail" aria-hidden="true">
+  <div class="rail-inner">
+    <div class="rail-item" data-rail="s0"><span class="n">—</span> 仕組み</div>
+    <div class="rail-item" data-rail="s1"><span class="n">1</span> 見つかるもの</div>
+    <div class="rail-item" data-rail="sx"><span class="n">—</span> 見どころ</div>
+    <div class="rail-item" data-rail="s2"><span class="n">2</span> 全員で揃える</div>
+    <div class="rail-item" data-rail="s4"><span class="n">—</span> まとめ</div>
+  </div>
+</nav>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="m10 12-2 2 2 2"/><path d="m14 12 2 2-2 2"/></symbol>
+  <symbol id="i-chip" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M4 10h3M4 14h3M17 10h3M17 14h3M10 4v3M14 4v3M10 17v3M14 17v3"/></symbol>
+  <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M6.5 18a4.5 4.5 0 0 1-.4-8.98A6 6 0 0 1 17.7 9.2 4 4 0 0 1 17.5 18z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6L16 9.4"/></symbol>
+  <symbol id="i-scope" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-4.3-4.3"/><path d="M11 8v6M8 11h6"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.5 20h19z"/><path d="M12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><path d="M16 5.6a3.2 3.2 0 0 1 0 6.3M17.5 14.4A5.5 5.5 0 0 1 20.5 19"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></symbol>
+</defs></svg>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">SonarQube for IDE / VS Code 拡張機能</div>
+    <h1>リアルタイム解析ツール<br> SonarQube for IDE とは</h1>
+    <p class="lede">
+      問題を 5 つ埋めた Python コードが 2 ファイルあります。フォルダを開いて数秒後には、
+      <b>秘密情報の直書き、攻撃の入り口、機能していないテスト、読みづらい構造</b>——
+      性格の違う指摘が同時に並びます。しかも、解析しているのはサーバーではなく、あなたの PC です。
+    </p>
+    <div class="hero-counts">
+      <div class="hc s1"><div class="k">見つかった問題</div><div class="v">5</div><div class="u">／ Python 2 ファイル</div></div>
+      <div class="hc s2"><div class="k">またがる種別</div><div class="v">3</div><div class="u">セキュリティ・バグ・保守性</div></div>
+      <div class="hc s3"><div class="k">外に送るコード</div><div class="v">0</div><div class="u">バイト（解析は手元で完結）</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- ================= S0 : 仕組み ================= -->
+<section id="s0">
+  <div class="wrap stack rv">
+    <div class="sec-head">
+      <span class="sec-num">仕組み</span>
+      <h2>まず、解析するプログラムはどこにいるのか</h2>
+    </div>
+    <p class="sub">
+      ここを外すと、あとの話がすべてぼやけます。SonarQube for IDE は「サーバーに質問を投げる窓口」ではありません。
+      <b>解析エンジンそのものが拡張機能の中に入っていて、あなたの PC の上で動きます。</b>
+      拡張機能をインストールした時点で、言語ごとの解析エンジンと既定のルール一式が手元にコピーされます。
+    </p>
+  </div>
+  <div class="wide stack rv" style="margin-top:30px">
+    <div class="machine">
+      <div class="col local">
+        <div class="mtag" style="display:flex;align-items:center;gap:7px"><svg class="icon icon-sm"><use href="#i-chip"/></svg>あなたの PC</div>
+        <h3>解析エンジン ＋ ルール表</h3>
+        <p>拡張機能に同梱。ファイルを編集・保存するたびに、開いているコードをその場で読んで判定します。ネットワークに出ずに完結します。</p>
+      </div>
+      <div class="divider"></div>
+      <div class="col">
+        <div class="mtag" style="display:flex;align-items:center;gap:7px"><svg class="icon icon-sm"><use href="#i-cloud"/></svg>SonarQube サーバー</div>
+        <h3>チーム共通の設定</h3>
+        <p>「どのルールを有効にするか」という表を持ちます。この表をチーム全員に配ることが、サーバー側の役割です。</p>
+      </div>
+    </div>
+    <div class="noflow">
+      <svg class="icon"><use href="#i-lock"/></svg>
+      <p><b>ソースコードは、つないでも送られません。</b>後半に出てくる「接続」でサーバーから下りてくるのは設定であって、コードが上っていくわけではありません。解析は最初から最後まで、あなたの PC の中で完結します。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= S1 : 見つかるもの ================= -->
+<section id="s1" style="background:var(--surface-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line)">
+  <div class="wrap stack rv">
+    <div class="sec-head">
+      <span class="sec-num">検知</span>
+      <h2>1 つの拡張機能が、これだけの種類をまとめて拾う</h2>
+    </div>
+    <p class="sub">
+      アカウントもサーバーも要りません。VS Code に拡張機能を入れてファイルを開くと、その瞬間から下線が引かれます。
+      文法を解釈して構文木にし、ルール表と照合する——これを入力のたびに繰り返しています。
+    </p>
+    <div class="legend">
+      <div class="lg"><span class="kind sec">セキュリティ</span><p>秘密情報の直書き、外部入力を信用しきった危険な処理</p></div>
+      <div class="lg"><span class="kind bug">バグ</span><p>動いてしまうから気づけない、意図と食い違った書き方</p></div>
+      <div class="lg"><span class="kind mnt">保守性</span><p>読みづらさ・壊しやすさにつながるコードの構造</p></div>
+    </div>
+
+    <div class="finds" style="margin-top:12px">
+      <div class="find k-sec">
+        <div class="find-head"><span class="chip">python:S6418</span><span class="kind sec">セキュリティ</span></div>
+        <div class="find-title">API キーがソースコードに直接書かれている</div>
+        <pre class="code"><span class="ln">40</span>API_KEY = <span class="hl">"aB3xY9zQ7mK2pL5nR8tV4wC6dF1gH0jS"</span></pre>
+        <p class="find-why">変数名だけで判定しているのではありません。文字列の<b>エントロピー（ランダムさ）</b>まで見て、「人が読むための文字列ではなさそうだ」と判断しています。</p>
+      </div>
+      <div class="find k-sec">
+        <div class="find-head"><span class="chip">python:S2068</span><span class="kind sec">セキュリティ</span></div>
+        <div class="find-title">パスワードがソースコードに直接書かれている</div>
+        <pre class="code"><span class="ln">51</span>DB_PASSWORD = <span class="hl">"kR7vQn2mXt9Bz4Lw"</span></pre>
+        <p class="find-why">一度コミットすると Git の履歴から消すのが非常に厄介になる種類の問題です。<b>コミット前に気づけること自体に価値があります。</b></p>
+      </div>
+      <div class="find k-sec">
+        <div class="find-head"><span class="chip">python:S5042</span><span class="kind sec">セキュリティ</span></div>
+        <div class="find-title">ZIP を展開サイズの上限なしで展開している（Zip Bomb）</div>
+        <pre class="code"><span class="ln">78</span>zipfile.ZipFile(archive_path).<span class="hl">extractall</span>(UPLOAD_DIR)</pre>
+        <p class="find-why">数十 KB の ZIP が展開後に数十 GB になる細工が可能で、ディスクを埋め尽くされます。文字列の一致では出せない指摘です。<code>ZipFile(...)</code> が返すオブジェクトの<b>型を解決したうえで</b>、その <code>extractall()</code> 呼び出しだと理解しています。</p>
+      </div>
+      <div class="find k-bug">
+        <div class="find-head"><span class="chip">python:S5905</span><span class="kind bug">バグ</span></div>
+        <div class="find-title">テストコードの assert が、絶対に失敗しない書き方になっている</div>
+        <pre class="code"><span class="ln">101</span>assert <span class="hl">(</span>result["rank"] == "S", "管理者で高得点なら S になるはず"<span class="hl">)</span></pre>
+        <p class="find-why">テストは実行され、PASS します。それでいて何も検査していません。何が起きているのかは、次の節で 1 ステップずつ追います。</p>
+      </div>
+      <div class="find k-mnt">
+        <div class="find-head"><span class="chip">python:S134</span><span class="kind mnt">保守性</span></div>
+        <div class="find-title">制御構文のネストが深すぎる（このコードは 5 段）</div>
+        <pre class="code"><span class="ln">110</span>if role == "admin":
+<span class="ln">111</span>    if age &gt;= 18:
+<span class="ln">112</span>        if country == "JP":
+<span class="ln">113</span>            <span class="hl">if score &gt;= 80:</span>   <span class="cm"># 5 段目</span></pre>
+        <p class="find-why">動作はします。ただ、条件が 1 つ増えるたびに読み手の負担が跳ね上がり、修正のときにバグを埋め込みやすくなります。早期リターンで段数を減らすのが定石です。</p>
+      </div>
+    </div>
+
+    <div class="scope" style="margin-top:6px">
+      <svg class="icon"><use href="#i-bolt"/></svg>
+      <div>ここまで <b>保存すら不要</b>。打っている途中で結果が返り、直せばその場で下線が消えます。</div>
+    </div>
+
+    <div class="panel-flat">
+      <h3>テストコードも、同じように解析される</h3>
+      <p style="font-size:14px;color:var(--ink-2)">
+        「テストは対象外」と思われがちですが、そんなことはありません。上の 4 件目は
+        <code>test_user_manager.py</code> の中の問題です。プロダクトコードと同じ基準で読まれます。
+      </p>
+    </div>
+
+    <div class="panel-flat">
+      <h3>この 5 件を判定したルールは、すべて最初から手元にある</h3>
+      <p style="font-size:14px;color:var(--ink-2)">
+        Python の解析エンジンには <b>435 個</b>のルールが同梱されていて、そのうち <b>398 個</b>が最初から ON。
+        これが <b>Sonar way</b> という既定のルールセットです。残り 37 個が OFF なのは、間違ったルールだからではなく
+        <b>「有効にするかどうかがチームの判断に属する」</b>から。ON にするのはチェックボックス 1 つで、
+        エンジンを入れ替える必要も、コードを送る必要もありません。
+        裏を返せば、既定で ON の 398 個は<b>どのチームでも「これは直すべき」と言えるものだけ</b>です。
+        合意形成も規約づくりもなしに、チーム全員がいきなりこの水準から書き始められます。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= INTERLUDE : テストの見どころ ================= -->
+<section id="sx">
+  <div class="wrap stack rv">
+    <div class="sec-head">
+      <span class="sec-num">見どころ</span>
+      <h2>テストは通っている。でも、何も守っていない</h2>
+    </div>
+    <p class="sub">
+      さきほどの 4 件目です。一見ふつうの assert に見えます。実際、<b>このテストは実行され、PASS します。</b>
+      壊れているのは「実行されるかどうか」ではなく、<b>何を検査しているか</b>のほうです。
+    </p>
+  </div>
+
+  <div class="wide rv" style="margin-top:28px">
+    <div class="chase" id="chase">
+      <div class="chase-title">assert (A, B) が評価される順序</div>
+      <div class="hop" data-hop="1">
+        <div class="dot"><i></i><div class="line"></div></div>
+        <div class="body">
+          <div class="role">書いたコード</div>
+          <div class="src">assert (result["rank"] == "S", "管理者で高得点なら S になるはず")</div>
+          <div class="note"><code>assert</code> は関数ではありません。だから括弧を付けても「引数を囲んだ」ことにはならず、<b>タプルを作ります</b>。</div>
+        </div>
+      </div>
+      <div class="hop" data-hop="2">
+        <div class="dot"><i></i><div class="line"></div></div>
+        <div class="body">
+          <div class="role">① 括弧の中身は評価される</div>
+          <div class="src">result["rank"] == "S"   →   False</div>
+          <div class="note">比較そのものはきちんと計算されています。ここまでは意図どおりです。</div>
+        </div>
+      </div>
+      <div class="hop" data-hop="3">
+        <div class="dot"><i></i><div class="line"></div></div>
+        <div class="body">
+          <div class="role">② その結果を第 1 要素にしたタプルが組み立てられる</div>
+          <div class="src">(False, "管理者で高得点なら S になるはず")</div>
+          <div class="note">この瞬間、①で出した <code>False</code> は袋の中に詰められ、<b>誰にも見られなくなります</b>。</div>
+        </div>
+      </div>
+      <div class="hop sink" data-hop="4">
+        <div class="dot"><i></i></div>
+        <div class="body">
+          <div class="role">③ assert が真偽を見るのは、このタプルそのもの</div>
+          <div class="src">assert (2 要素のタプル)   →   常に真   →   PASS</div>
+          <div class="note">空でないタプルは必ず真です。つまりこの assert は、<b>何があっても失敗しません</b>。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap stack rv" style="margin-top:28px">
+    <div class="noflow" style="background:var(--red-soft);border-color:var(--red-line)">
+      <svg class="icon"><use href="#i-alert"/></svg>
+      <p>
+        <b>スキップされたテストなら気づけます。</b>レポートに <code>skipped</code> と出るからです。これは違います。
+        堂々と PASS し、CI も緑になります。<b>テストが緑である限り、CI もコードレビューも素通りする</b>——
+        気づける場所は、書いているエディタの中しか残っていません。
+      </p>
+    </div>
+    <div class="finds">
+      <div class="find" style="border-left-color:var(--teal)">
+        <div class="find-head"><span class="chip">直し方</span><svg class="icon icon-sm" style="color:var(--teal)"><use href="#i-check"/></svg></div>
+        <div class="find-title">括弧を 2 文字消す。または <code>assertEqual</code> に書き換える</div>
+        <pre class="code">assert result["rank"] == "S", "管理者で高得点なら S になるはず"
+self.assertEqual(result["rank"], "S", "管理者で高得点なら S になるはず")</pre>
+        <p class="find-why"><code>assertEqual</code> は<b>そもそも関数</b>なので、括弧を付けても壊れません。失敗したときに「S を期待したが Z だった」と差分まで出ます。保存すれば、下線はその場で消えます。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= S2 : 全員で揃える ================= -->
+<section id="s2" style="background:var(--surface-2); border-top:1px solid var(--line); border-bottom:1px solid var(--line)">
+  <div class="wrap stack rv">
+    <div class="sec-head">
+      <span class="sec-num">チーム</span>
+      <h2>全員のエディタを、まったく同じ基準に揃える</h2>
+    </div>
+    <p class="sub">
+      使い始めると必ず出てくるのが、「このルールも有効にしよう」「この指摘はうちには要らない」という話です。
+      問題は、その決めごとが<b>各自が手元で設定しない限り、誰の IDE にも効かない</b>こと。
+      会議で決めても設定するのは半分、新しく入った人の環境は誰も知らない——こうしてチームの中に
+      「厳しい人の環境」と「緩い人の環境」ができていきます。
+    </p>
+    <p class="sub" style="margin-top:0">
+      SonarQube サーバー（または SonarQube Cloud）のプロジェクトと IDE を紐づける（バインドする）と、
+      <b>サーバー側で決めた品質プロファイルが、そのまま各自の IDE に降りてきます。</b>これが Connected Mode です。
+    </p>
+    <div class="claim">
+      <p>サーバー側で 1 回決めれば、バインドしている開発者全員の IDE が、まったく同じルール・まったく同じ深刻度で動きます。</p>
+      <p class="s">コード品質とセキュリティの基準を、人に依存させずに全員へ揃えられる、ということです。</p>
+    </div>
+  </div>
+
+  <div class="wide stack rv" style="margin-top:28px">
+    <div class="flow2">
+      <div class="end">
+        <div class="mtag">あなたの PC</div>
+        <h3>解析エンジン</h3>
+        <p>変わりません。同じエンジンが、同じファイルを読みます。</p>
+      </div>
+      <div class="mid">
+        <div class="arrowlbl">ルール表</div>
+        <svg class="icon arrow-down" style="width:26px;height:26px;margin:0 auto;transform:rotate(180deg)"><use href="#i-down"/></svg>
+        <div style="border-top:1px dashed var(--line);padding-top:10px">
+          <svg class="icon arrow-x" style="width:22px;height:22px;margin:0 auto"><use href="#i-x"/></svg>
+          <div class="arrowlbl" style="color:var(--red)">コードは<br>上らない</div>
+        </div>
+      </div>
+      <div class="end">
+        <div class="mtag">SonarQube サーバー</div>
+        <h3>品質プロファイル</h3>
+        <p>「どのルールを ON にするか」というチーム共通の表。これが全員の手元に下りてきます。</p>
+      </div>
+    </div>
+
+    <div class="same">
+      <div class="cell"><div class="k">ENGINE</div><div class="v">同じ（手元）</div></div>
+      <div class="cell"><div class="k">SPEED</div><div class="v">同じ（入力しながら即時）</div></div>
+      <div class="cell"><div class="k">RULES</div><div class="v" style="color:var(--amber)">全員そろう</div></div>
+    </div>
+  </div>
+
+  <div class="wrap stack rv" style="margin-top:34px">
+    <div class="wins">
+      <div class="win">
+        <svg class="icon"><use href="#i-check"/></svg>
+        <div>
+          <h3>底上げ ― 決めた基準が、その日から全員に効く</h3>
+          <p>「うちは外部から ZIP を受け取るので Zip Bomb のルールは必須」と決めれば、サーバー側の 1 操作で全員のエディタに届きます。<b>判定するルールは最初から全員の手元にある</b>ので、push もサーバーの解析待ちも発生しません。</p>
+        </div>
+      </div>
+      <div class="win">
+        <svg class="icon"><use href="#i-users"/></svg>
+        <div>
+          <h3>ノイズ削減 ― 「対応しない」という判断も共有される</h3>
+          <p>チームとして「この指摘は要らない」と決めたルールを OFF にすれば、全員のエディタから一斉に消えます。サーバー側で誰かが下した判断が各自の画面に反映されるので、<b>「自分の環境だけ指摘が出る／出ない」が起きません。</b></p>
+        </div>
+      </div>
+      <div class="win">
+        <svg class="icon"><use href="#i-file"/></svg>
+        <div>
+          <h3>新メンバーの初日から ― 規約集を覚えてもらう工程が要らない</h3>
+          <p>バインドした時点で、その人の環境はチームの基準そのものになります。レビューでばらつくのはレビュアーの厳しさだけではありません。<b>そもそも各自のエディタが違うものを見ている</b>状態を、1 か所の設定で解消できます。</p>
+        </div>
+      </div>
+    </div>
+    <div class="scope">
+      <svg class="icon"><use href="#i-alert"/></svg>
+      <div><b>実務メモ：</b>接続を登録しただけではルール表は下りてきません。作業フォルダとサーバー上のプロジェクトを紐づけて、はじめて届きます。また同期はリアルタイムではないので、<b>「次にエディタを開いたときから、全員に効く」</b>と考えておくのが正確です。</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= S4 : まとめ ================= -->
+<section id="s4">
+  <div class="wrap stack rv">
+    <div class="sec-head">
+      <span class="sec-num">まとめ</span>
+      <h2>つないでも、動いているのは 1 か所だけ</h2>
+    </div>
+    <p class="sub">
+      並べ替えると、Connected Mode で変わるところが 1 行しかないことが分かります。
+      <b>エンジンも、見ている範囲も、応答の速さも、コードを送らないことも同じ。</b>
+      変わるのは「ルールを誰が決めるか」だけです。
+    </p>
+  </div>
+  <div class="wide rv" style="margin-top:26px">
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th></th><th>入れただけ</th><th>つないだ状態（Connected Mode）</th></tr>
+        </thead>
+        <tbody>
+          <tr><th>やること</th><td>拡張機能を入れるだけ</td><td>サーバーのプロジェクトと紐づける</td></tr>
+          <tr><th>解析が動く場所</th><td>手元の PC</td><td class="same-cell">手元の PC（同じ）</td></tr>
+          <tr><th>見ている範囲</th><td>開いているファイル</td><td class="same-cell">開いているファイル（同じ）</td></tr>
+          <tr><th>結果が出るまで</th><td>入力しながら即時</td><td class="same-cell">入力しながら即時（同じ）</td></tr>
+          <tr><th>表示先</th><td>Problems タブ</td><td class="same-cell">Problems タブ（同じ）</td></tr>
+          <tr><th>ソースコードの送信</th><td>なし</td><td class="same-cell">なし（同じ）</td></tr>
+          <tr><th>行き来するもの</th><td>なし</td><td class="chg">ルール表が下りてくる</td></tr>
+          <tr><th>ルールを決めるのは</th><td>各自の環境ごと</td><td class="chg">チームで 1 か所（全員同じ）</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SOURCES ================= -->
+<section style="padding-top:56px; background:var(--surface-2); border-top:1px solid var(--line)">
+  <div class="wrap sources" style="border-top:0; padding-top:0">
+    <h2 style="font-size:20px">情報ソース</h2>
+    <p style="font-size:14px;color:var(--ink-2);margin-top:10px">下のリンクはすべてクリックできます。ルール ID を押すと、そのルールが何を検知するのかの公式な説明にたどり着けます。</p>
+    <div class="srclist">
+      <a href="https://docs.sonarsource.com/sonarqube-for-vs-code/" target="_blank" rel="noopener"><span class="t">SonarQube for VS Code 公式ドキュメント</span><span class="u">docs.sonarsource.com/sonarqube-for-vs-code/</span></a>
+      <a href="https://docs.sonarsource.com/sonarqube-for-vs-code/connect-your-ide/setup" target="_blank" rel="noopener"><span class="t">Connected Mode のセットアップ（接続とバインド）</span><span class="u">docs.sonarsource.com/sonarqube-for-vs-code/connect-your-ide/setup</span></a>
+      <a href="https://rules.sonarsource.com/python/" target="_blank" rel="noopener"><span class="t">Python ルール一覧（435 ルールの全文）</span><span class="u">rules.sonarsource.com/python/</span></a>
+      <a href="https://rules.sonarsource.com/python/RSPEC-6418/" target="_blank" rel="noopener"><span class="t">python:S6418 — ハードコードされた秘密情報</span><span class="u">rules.sonarsource.com/python/RSPEC-6418/</span></a>
+      <a href="https://rules.sonarsource.com/python/RSPEC-2068/" target="_blank" rel="noopener"><span class="t">python:S2068 — ハードコードされた認証情報</span><span class="u">rules.sonarsource.com/python/RSPEC-2068/</span></a>
+      <a href="https://rules.sonarsource.com/python/RSPEC-5905/" target="_blank" rel="noopener"><span class="t">python:S5905 — タプルに対する assert</span><span class="u">rules.sonarsource.com/python/RSPEC-5905/</span></a>
+      <a href="https://rules.sonarsource.com/python/RSPEC-5042/" target="_blank" rel="noopener"><span class="t">python:S5042 — アーカイブ展開時の資源制御</span><span class="u">rules.sonarsource.com/python/RSPEC-5042/</span></a>
+      <a href="https://rules.sonarsource.com/python/RSPEC-134/" target="_blank" rel="noopener"><span class="t">python:S134 — 制御構文のネストの深さ</span><span class="u">rules.sonarsource.com/python/RSPEC-134/</span></a>
+      <a href="https://docs.python.org/3/reference/simple_stmts.html#the-assert-statement" target="_blank" rel="noopener"><span class="t">Python 言語リファレンス — assert 文</span><span class="u">docs.python.org/3/reference/simple_stmts.html#the-assert-statement</span></a>
+      <a href="https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarlint-vscode" target="_blank" rel="noopener"><span class="t">VS Code Marketplace — SonarQube for IDE</span><span class="u">marketplace.visualstudio.com/items?itemName=SonarSource.sonarlint-vscode</span></a>
+    </div>
+  </div>
+</section>
+
+<footer style="background:var(--surface-2)">
+  <div class="wrap">
+    この図解の 5 件は、問題を意図的に仕込んだデモ用リポジトリ（Python 2 ファイル）を解析した結果です。
+    435 個・398 個 ON という数字は Python アナライザのもので、言語やアナライザのバージョンによって変わります。
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  var rvs = document.querySelectorAll(".rv");
+  if (!("IntersectionObserver" in window) || reduce) {
+    rvs.forEach(function(el){ el.classList.add("in"); });
+  } else {
+    var ro = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) { e.target.classList.add("in"); ro.unobserve(e.target); }
+      });
+    }, {rootMargin:"0px 0px -12% 0px", threshold:0.08});
+    rvs.forEach(function(el){ ro.observe(el); });
+  }
+
+  var rail = {};
+  document.querySelectorAll(".rail-item").forEach(function(it){ rail[it.dataset.rail] = it; });
+  var secs = ["s0","s1","sx","s2","s4"].map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  function updateRail(){
+    var best = null, bestTop = -Infinity, mark = window.innerHeight * 0.35;
+    secs.forEach(function(s){
+      var t = s.getBoundingClientRect().top;
+      if (t <= mark && t > bestTop) { bestTop = t; best = s; }
+    });
+    Object.keys(rail).forEach(function(k){ rail[k].classList.toggle("on", !!best && best.id === k); });
+  }
+  var ticking = false;
+  window.addEventListener("scroll", function(){
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(function(){ updateRail(); ticking = false; });
+  }, {passive:true});
+  updateRail();
+
+  var hops = document.querySelectorAll("#chase .hop");
+  if (reduce || !("IntersectionObserver" in window)) {
+    hops.forEach(function(h){ h.classList.add("lit"); });
+  } else {
+    var co = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (!e.isIntersecting) return;
+        co.disconnect();
+        hops.forEach(function(h, i){
+          setTimeout(function(){ h.classList.add("lit"); }, 260 + i * 520);
+        });
+      });
+    }, {threshold:0.3});
+    co.observe(document.getElementById("chase"));
+  }
+})();
+</script>

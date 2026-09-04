@@ -1,0 +1,58 @@
+<!-- wp:html -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "SonarLint と SonarQube for IDE の違いは？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "同じ製品です。SonarLint が SonarQube for IDE に名称変更されました。SonarQube ファミリーとして名前が統一された形で、機能が別物になったわけではありません。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "ソースコードは外部に送信されますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "送信されません。解析エンジンは拡張機能に同梱されていて、解析は開発者の PC 上で完結します。ネットワークに接続していない状態でも動作します。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "SonarQube サーバーがないと使えませんか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "サーバーなしで使えます。拡張機能を入れてファイルを開くだけで、既定のルールセットによる解析が始まります。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "SonarQube サーバーに繋ぐと何が変わりますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "解析の走る場所は変わりません（引き続き手元の IDE です）。変わるのは有効になるルールの範囲で、サーバー側で決めた ON / OFF が各自の IDE に降りてきます。実測では、同じファイルに対する指摘が 2 件から 9 件に増えました。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "SonarQube for IDE が対応している言語は？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Java、JavaScript / TypeScript、Python、C#、C / C++、PHP、Go、Kotlin、Ruby、HTML、CSS、Secrets（認証情報の検出）など、多数の言語に対応しています。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "ESLint や Ruff のようなリンターと何が違いますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "役割は重なります。大きな違いは、設定ファイルを書かなくても実用的な既定値がすぐ効くことと、指摘に「なぜ直すべきか」の解説が付いてくることです。併用しても構いません。"
+      }
+    }
+  ]
+}
+</script>
+<!-- /wp:html -->
